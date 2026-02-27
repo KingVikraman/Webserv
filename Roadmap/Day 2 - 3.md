@@ -79,11 +79,11 @@ int main() {
 5. Type anything - it should echo back
 
 **Understanding check (BOTH must answer):**
-- [ ] What does `socket()` do?
-- [ ] What does `bind()` do?
-- [ ] What does `listen()` do?
-- [ ] What does `accept()` do?
-- [ ] What does `read()` return when client disconnects?
+- [✅] What does `socket()` do?
+- [✅] What does `bind()` do?
+- [✅] What does `listen()` do?
+- [✅] What does `accept()` do?
+- [✅] What does `read()` return when client disconnects?
 
 **Deliverable:** Both can explain each system call. Both can modify the port number.
 

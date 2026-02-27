@@ -10,12 +10,12 @@ HTTP is just **text** sent over a network. Before writing any code, you need to 
 
 ---
 
-[/] Step 1: Send Your First HTTP Request
-[/] Step 2: Type the HTTP Request
-[/] Step 3: Watch the Magic Happen
-[/] Step 4: Take a Screenshot
-[/] Step 5: Identify the Parts
-[/] Step 6: Try More Sites
+[✅] Step 1: Send Your First HTTP Request
+[✅] Step 2: Type the HTTP Request
+[✅] Step 3: Watch the Magic Happen
+[✅] Step 4: Take a Screenshot
+[✅] Step 5: Identify the Parts
+[✅] Step 6: Try More Sites
 
 ---
 

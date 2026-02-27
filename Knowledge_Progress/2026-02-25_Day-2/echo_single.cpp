@@ -1,7 +1,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <string>
+#include <cstring>
 #include <iostream>
+#include <unistd.h>
 
 
 int main() 
@@ -31,7 +32,46 @@ int main()
 
 	std::cout << "Socket bound to port 8080\n";
 
-	// Section 
+	// Section 4 : Start listening
+	if (listen(server_fd, 10) < 0)
+	{
+		std::cerr << "Listen failed" << std::endl;
+		return 1;
+	}
 
+	std::cout << "Server listening to port 8080..." << std::endl;
+	std::cout << "Waiting for connections..." << std::endl;
 
+	// Section 5 : Accept ONE client connection
+	int client_fd = accept(server_fd, NULL, NULL);
+	if (client_fd < 0)
+	{
+		std::cerr << "Accept failed" << std::endl;
+		return 1;
+	}
+
+	std::cout << "Client connected! fd= " << client_fd << std::endl;
+
+	// Section 6 : Echo Loop
+	char buffer[1024];
+	while (true)
+	{
+		memset(buffer, 0, sizeof(buffer));
+		int bytes_read = read(client_fd, buffer, sizeof(buffer) - 1);
+
+		if(bytes_read <= 0)
+		{
+			std::cout << "Client disconnected" << std::endl;
+			break;
+		}
+
+		std::cout << "Recieved " << bytes_read << "bytes: " << buffer;
+		write(client_fd, buffer, bytes_read);
+	}
+
+	close(client_fd);
+	close(server_fd);
+
+	std::cout << "Server Closed [/]" << std::endl;
+	return 0;
 }
