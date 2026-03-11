@@ -6,7 +6,7 @@
 /*   By: zernest <zernest@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 20:55:06 by zernest           #+#    #+#             */
-/*   Updated: 2026/03/10 21:07:55 by zernest          ###   ########.fr       */
+/*   Updated: 2026/03/11 22:48:01 by zernest          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <fstream>
+#include <sstream>
 
 class LocationConfig
 {
