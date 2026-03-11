@@ -16,10 +16,37 @@ void toLower(std::string &str)
         str[i] = std::tolower(str[i]);
 }
 
-bool    validUriChar(uint8_t ch)
+bool validUriChar(uint8_t ch)
 {
     if ((ch >= '#' && ch <= ';') || (ch >= '?' && ch <= '[') || (ch >= 'a' && ch <= 'z') ||
-       ch == '!' || ch == '=' || ch == ']' || ch == '_' || ch == '~')
+        ch == '!' || ch == '=' || ch == ']' || ch == '_' || ch == '~')
+        return (true);
+    return (false);
+}
+
+bool invalidUriPosition(std::string path) // prevent path from going before root
+{
+    std::string tmp(path);
+    char *res = strtok((char *)tmp.c_str(), "/"); // tokenize the path by '/'
+    int pos = 0;
+    while (res != NULL)
+    {
+        if (!strcmp(res, ".."))
+            pos--;
+        else
+            pos++;
+        if (pos < 0)
+            return (1);
+        res = strtok(NULL, "/"); // get the next token
+    }
+    return (0);
+}
+
+bool    isToken(uint8_t ch)
+{
+    if (ch == '!' || (ch >= '#' && ch <= '\'') || ch == '*'|| ch == '+' || ch == '-'  || ch == '.' ||
+       (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z') || (ch >= '^' && ch <= '`') ||
+       (ch >= 'a' && ch <= 'z') || ch == '|')
         return (true);
     return (false);
 }
@@ -228,21 +255,21 @@ void HttpRequest::feed(char *data, size_t size)
         }
         case Request_Line_URI_Path:
         {
-            if (character == ' ')
+            if (character == ' ') // URL eneded, now expect HTTP version
             {
                 _state = Request_Line_Ver;
                 _path.append(_storage);
                 _storage.clear();
                 continue;
             }
-            else if (character == '?')
+            else if (character == '?') // URL query string starts, now expect query string
             {
                 _state = Request_Line_URI_Query;
                 _path.append(_storage);
                 _storage.clear();
                 continue;
             }
-            else if (character == '#')
+            else if (character == '#') // URL fragment starts, now expect fragment
             {
                 _state = Request_Line_URI_Fragment;
                 _path.append(_storage);
@@ -259,6 +286,193 @@ void HttpRequest::feed(char *data, size_t size)
             {
                 _error_code = 414;
                 std::cout << "URI Too Long (Request_Line_URI_Path)" << std::endl;
+                return;
+            }
+            break;
+        }
+        case Request_Line_URI_Query: // for query string
+        {
+            if (character == ' ') // url eneded, now expect HTTP version
+            {
+                _state = Request_Line_Ver;
+                _query.append(_storage);
+                _storage.clear();
+                continue;
+            }
+            else if (character == '#')
+            {
+                _state = Request_Line_URI_Fragment;
+                _query.append(_storage);
+                _storage.clear();
+                continue;
+            }
+            else if (!validUriChar(character))
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_URI_Query)" << std::endl;
+                return;
+            }
+            else if (i > MAX_URI_LENGTH)
+            {
+                _error_code = 414;
+                std::cout << "URI Too Long (Request_Line_URI_Path)" << std::endl;
+                return;
+            }
+            break;
+        }
+        case Request_Line_URI_Fragment:
+        {
+            if (character == ' ')
+            {
+                _state = Request_Line_Ver;
+                _fragment.append(_storage);
+                _storage.clear();
+                continue;
+            }
+            else if (!validUriChar(character))
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_URI_Fragment)" << std::endl;
+                return;
+            }
+            else if (i > MAX_URI_LENGTH)
+            {
+                _error_code = 414;
+                std::cout << "URI Too Long (Request_Line_URI_Path)" << std::endl;
+                return;
+            }
+            break;
+        }
+        case Request_Line_Ver:
+        {
+            if (invalidUriPosition(_path))
+            {
+                _error_code = 400;
+                std::cout << "Request URI ERROR: goes before root !" << std::endl;
+                return;
+            }
+            if (character != 'H') // Should be H for HTTP version if not error
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_Ver)" << std::endl;
+                return;
+            }
+            _state = Request_Line_HT;
+            break;
+        }
+        case Request_Line_HT:
+        {
+            if (character != 'T')
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_HT)" << std::endl;
+                return;
+            }
+            _state = Request_Line_HTT;
+            break;
+        }
+        case Request_Line_HTT:
+        {
+            if (character != 'T')
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_HTT)" << std::endl;
+                return;
+            }
+            _state = Request_Line_HTTP;
+            break;
+        }
+        case Request_Line_HTTP:
+        {
+            if (character != 'P')
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_HTTP)" << std::endl;
+                return;
+            }
+            _state = Request_Line_HTTP_Slash;
+            break;
+        }
+        case Request_Line_HTTP_Slash:
+        {
+            if (character != '/')
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_HTTP_Slash)" << std::endl;
+                return;
+            }
+            _state = Request_Line_Major;
+            break;
+        }
+        case Request_Line_Major:
+        {
+            if (!isdigit(character))
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_Major)" << std::endl;
+                return;
+            }
+            _ver_major = character;
+
+            _state = Request_Line_Dot;
+            break;
+        }
+        case Request_Line_Dot:
+        {
+            if (character != '.')
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_Dot)" << std::endl;
+                return;
+            }
+            _state = Request_Line_Minor;
+            break;
+        }
+        case Request_Line_Minor:
+        {
+            if (!isdigit(character))
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_Minor)" << std::endl;
+                return;
+            }
+            _ver_minor = character;
+            _state = Request_Line_CR;
+            break;
+        }
+        case Request_Line_CR: // request line should end with CRLF, so expect \r first
+        {
+            if (character != '\r')
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_CR)" << std::endl;
+                return;
+            }
+            _state = Request_Line_LF;
+            break;
+        }
+        case Request_Line_LF:
+        {
+            if (character != '\n')
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Request_Line_LF)" << std::endl;
+                return;
+            }
+            _state = Field_Name_Start;
+            _storage.clear();
+            continue;
+        }
+        case Field_Name_Start:
+        {
+            if (character == '\r')
+                _state = Fields_End;
+            else if (isToken(character))
+                _state = Field_Name;
+            else
+            {
+                _error_code = 400;
+                std::cout << "Bad Character (Field_Name_Start)" << std::endl;
                 return;
             }
             break;
