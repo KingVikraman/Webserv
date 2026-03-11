@@ -78,7 +78,7 @@ class HttpRequest
         bool        parsingCompleted();
         void        printMessage();
         void        clear();
-        short       errorCode();
+        int         errorCode();
         bool        keepAlive();
         void        cutReqBody(int bytes);
     
@@ -90,15 +90,15 @@ class HttpRequest
         std::vector<u_int8_t>               _body;
         std::string                         _boundary;
         HttpMethod                          _method;
-        std::map<u_int8_t, std::string>     _method_str;
+        std::map<int, std::string>          _method_str;
         ParsingState                        _state;
         size_t                              _max_body_size;
         size_t                              _body_length;
-        short                               _error_code;
+        int                                 _error_code;
         size_t                              _chunk_length;
         std::string                         _storage;
         std::string                         _key_storage;
-        short                               _method_index;
+        int                                 _method_index;
         u_int8_t                            _ver_major;
         u_int8_t                            _ver_minor;
         std::string                         _server_name;
@@ -110,4 +110,6 @@ class HttpRequest
         bool                                _complete_flag;
         bool                                _chunked_flag;
         bool                                _multiform_flag;
+
+        void        _handle_headers();
 };
