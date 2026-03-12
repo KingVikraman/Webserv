@@ -6,9 +6,12 @@
 /*   By: zernest <zernest@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 20:55:06 by zernest           #+#    #+#             */
-/*   Updated: 2026/03/11 22:48:01 by zernest          ###   ########.fr       */
+/*   Updated: 2026/03/12 20:58:22 by zernest          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
 
 #include <iostream>
 #include <vector>
@@ -38,3 +41,7 @@ public:
 	std::map<int, std::string> error_pages;
 	std::vector<LocationConfig> locations;
 };
+
+std::string readFile(const std::string& filename);
+
+#endif
