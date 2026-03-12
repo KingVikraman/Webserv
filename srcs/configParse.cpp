@@ -1,23 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   configParse.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zernest <zernest@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/03/10 20:54:41 by zernest           #+#    #+#             */
-/*   Updated: 2026/03/12 22:45:05 by zernest          ###   ########.fr       */
+/*   Created: 2026/03/12 22:48:33 by zernest           #+#    #+#             */
+/*   Updated: 2026/03/12 22:59:58 by zernest          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "config.hpp"
+#include "configParse.hpp"
 
-int main()
+configParse::configParse(const std::vector<std::string> &tokens) : tokens(tokens), pos(0) {}
+
+void configParse::parse()
 {
-	std::string config = readFile("config.conf");
-	std::vector<std::string> tokens = tokenize(config);
-	for(size_t i = 0; i < tokens.size(); i++)
+	while (pos < tokens.size())
 	{
-		std::cout << tokens[i] << std::endl;
+		std::string token = tokens[pos];
+
+		if (token == "server")
+		{
+			// write parseServer function
+			parseServer();
+		}
+		pos++;
 	}
 }
