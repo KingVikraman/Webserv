@@ -6,7 +6,7 @@
 /*   By: zernest <zernest@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 22:48:33 by zernest           #+#    #+#             */
-/*   Updated: 2026/03/17 18:16:10 by zernest          ###   ########.fr       */
+/*   Updated: 2026/03/17 21:19:55 by zernest          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void configParse::parse()
 		if (peek() == "server")
 		{
 			next();
-			// write parseServer function
+			// write parseServer functionn
 			std::cout << "Server Block Found\n";
 			parseServer();
 		}
