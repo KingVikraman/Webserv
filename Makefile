@@ -15,6 +15,8 @@ FILEHANDLER_TEST_SRC = tests/test_file_handler.cpp
 FILEHANDLER_TEST_BIN = tests/test_file_handler
 MIMETYPE_TEST_SRC = tests/test_mimetype.cpp
 MIMETYPE_TEST_BIN = tests/test_mimetype
+INTEGRATION_TEST_SRC = tests/test_request_handler.cpp
+INTEGRATION_TEST_BIN = tests/test_request_handler
 
 all: $(NAME)
 
@@ -37,6 +39,9 @@ $(FILEHANDLER_TEST_BIN): $(FILEHANDLER_TEST_SRC) $(OFILES)
 $(MIMETYPE_TEST_BIN): $(MIMETYPE_TEST_SRC) $(OFILES)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(MIMETYPE_TEST_SRC) $(OFILES) -o $(MIMETYPE_TEST_BIN)
 
+$(INTEGRATION_TEST_BIN): $(INTEGRATION_TEST_SRC) $(OFILES)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(INTEGRATION_TEST_SRC) $(OFILES) -o $(INTEGRATION_TEST_BIN)
+
 test-parser: $(PARSER_TEST_BIN)
 	./$(PARSER_TEST_BIN)
 
@@ -49,11 +54,14 @@ test-filehandler: $(FILEHANDLER_TEST_BIN)
 test-mimetype: $(MIMETYPE_TEST_BIN)
 	./$(MIMETYPE_TEST_BIN)
 
-test: test-parser test-response test-filehandler test-mimetype
+test-integration: $(INTEGRATION_TEST_BIN)
+	./$(INTEGRATION_TEST_BIN)
+
+test: test-parser test-response test-filehandler test-mimetype test-integration
 
 clean:
 	rm -rf obj
-	rm -f $(PARSER_TEST_BIN) $(RESPONSE_TEST_BIN) $(FILEHANDLER_TEST_BIN) $(MIMETYPE_TEST_BIN)
+	rm -f $(PARSER_TEST_BIN) $(RESPONSE_TEST_BIN) $(FILEHANDLER_TEST_BIN) $(MIMETYPE_TEST_BIN) $(INTEGRATION_TEST_BIN)
 
 fclean: clean
 	rm -f $(NAME)

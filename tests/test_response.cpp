@@ -39,6 +39,10 @@ int main()
         "ok() helper works");
     expectTrue(HttpResponse::notFound().build().find("404 Not Found") != std::string::npos,
         "notFound() helper works");
+    expectTrue(HttpResponse::uriTooLong().build().find("414 URI Too Long") != std::string::npos,
+        "uriTooLong() helper works");
+    expectTrue(HttpResponse::notImplemented().build().find("501 Not Implemented") != std::string::npos,
+        "notImplemented() helper works");
 
     created = HttpResponse::created("Created body");
     created_output = created.build();

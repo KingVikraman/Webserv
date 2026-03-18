@@ -61,7 +61,7 @@ static void expectEqual(size_t actual, size_t expected, const std::string &name)
 
 static void feedString(HttpRequest &req, const std::string &raw)
 {
-    req.feed(const_cast<char *>(raw.c_str()), raw.size());
+    req.feed(raw.c_str(), raw.size());
 }
 
 static void expectMethodPrefix(const std::string &token, HttpMethod expected, const std::string &label)

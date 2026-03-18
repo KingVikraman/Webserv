@@ -191,7 +191,7 @@ void HttpRequest::_handle_headers()
     }
 }
 
-void HttpRequest::feed(char *data, size_t size)
+void HttpRequest::feed(const char *data, size_t size)
 {
     u_int8_t character;
     std::stringstream s; // Do check on this

@@ -22,7 +22,9 @@ std::string HttpResponse::_getStatusMessage(int code) const
         case 403: return "Forbidden";
         case 404: return "Not Found";
         case 405: return "Method Not Allowed";
+        case 414: return "URI Too Long";
         case 500: return "Internal Server Error";
+        case 501: return "Not Implemented";
         default: return "Unknown";
     }
 }
@@ -108,6 +110,26 @@ HttpResponse HttpResponse::methodNotAllowed()
     resp.setStatus(405);
     resp.setHeader("Content-Type", "text/html");
     resp.setBody("<html><body><h1>405 Method Not Allowed</h1></body></html>");
+    return resp;
+}
+
+HttpResponse HttpResponse::uriTooLong()
+{
+    HttpResponse resp;
+
+    resp.setStatus(414);
+    resp.setHeader("Content-Type", "text/html");
+    resp.setBody("<html><body><h1>414 URI Too Long</h1></body></html>");
+    return resp;
+}
+
+HttpResponse HttpResponse::notImplemented()
+{
+    HttpResponse resp;
+
+    resp.setStatus(501);
+    resp.setHeader("Content-Type", "text/html");
+    resp.setBody("<html><body><h1>501 Not Implemented</h1></body></html>");
     return resp;
 }
 

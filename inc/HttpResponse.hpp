@@ -29,6 +29,8 @@ class HttpResponse
         static HttpResponse noContent();
         static HttpResponse notFound();
         static HttpResponse methodNotAllowed();
+        static HttpResponse uriTooLong();
+        static HttpResponse notImplemented();
         static HttpResponse internalError();
         static HttpResponse badRequest();
 };

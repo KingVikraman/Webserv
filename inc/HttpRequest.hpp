@@ -74,7 +74,7 @@ class HttpRequest
         void        setMaxBodySize(size_t);
         void        setBody(std::string name);
 
-        void        feed(char *data, size_t size);
+        void        feed(const char *data, size_t size);
         bool        parsingCompleted();
         void        printMessage();
         void        clear();
