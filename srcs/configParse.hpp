@@ -6,7 +6,7 @@
 /*   By: zernest <zernest@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 20:55:06 by zernest           #+#    #+#             */
-/*   Updated: 2026/03/17 18:10:17 by zernest          ###   ########.fr       */
+/*   Updated: 2026/03/18 23:13:48 by zernest          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,10 +20,13 @@
 #include <fstream>
 #include <sstream>
 
+#include "config.hpp"
+
 class configParse
 {
 private:
 	std::vector<std::string> tokens;
+	std::vector<ServerConfig> servers;
 	size_t pos;
 public:
 	configParse(const std::vector<std::string> &tokens);
@@ -32,6 +35,7 @@ public:
 	void parse();
 	void expect(const std::string &expected);
 	void parseServer();
+	const std::vector<ServerConfig>& getServers() const;
 };
 
 #endif
