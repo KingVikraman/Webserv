@@ -6,7 +6,7 @@
 /*   By: zernest <zernest@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 20:55:06 by zernest           #+#    #+#             */
-/*   Updated: 2026/03/18 23:13:48 by zernest          ###   ########.fr       */
+/*   Updated: 2026/03/19 22:00:08 by zernest          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,9 @@ public:
 	std::string peek() const;
 	std::string next();
 	void parse();
-	void expect(const std::string &expected);
 	void parseServer();
+	void parseLocation(ServerConfig &server);
+	void expect(const std::string &expected);
 	const std::vector<ServerConfig>& getServers() const;
 };
 
