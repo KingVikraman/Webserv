@@ -3,6 +3,7 @@
 #include "FileHandler.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include "Router.hpp"
 
 class RequestHandler
 {
@@ -14,7 +15,7 @@ class RequestHandler
 
     private:
         FileHandler _file_handler;
+        Router _router;
 
-        std::string _resolvePath(HttpRequest &request) const;
         HttpResponse _buildErrorResponse(int status_code) const;
 };

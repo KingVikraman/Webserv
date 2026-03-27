@@ -17,6 +17,8 @@ MIMETYPE_TEST_SRC = tests/test_mimetype.cpp
 MIMETYPE_TEST_BIN = tests/test_mimetype
 INTEGRATION_TEST_SRC = tests/test_request_handler.cpp
 INTEGRATION_TEST_BIN = tests/test_request_handler
+ROUTER_TEST_SRC = tests/test_router.cpp
+ROUTER_TEST_BIN = tests/test_router
 
 all: $(NAME)
 
@@ -42,6 +44,9 @@ $(MIMETYPE_TEST_BIN): $(MIMETYPE_TEST_SRC) $(OFILES)
 $(INTEGRATION_TEST_BIN): $(INTEGRATION_TEST_SRC) $(OFILES)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(INTEGRATION_TEST_SRC) $(OFILES) -o $(INTEGRATION_TEST_BIN)
 
+$(ROUTER_TEST_BIN): $(ROUTER_TEST_SRC) $(OFILES)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(ROUTER_TEST_SRC) $(OFILES) -o $(ROUTER_TEST_BIN)
+
 test-parser: $(PARSER_TEST_BIN)
 	./$(PARSER_TEST_BIN)
 
@@ -57,11 +62,14 @@ test-mimetype: $(MIMETYPE_TEST_BIN)
 test-integration: $(INTEGRATION_TEST_BIN)
 	./$(INTEGRATION_TEST_BIN)
 
-test: test-parser test-response test-filehandler test-mimetype test-integration
+test-router: $(ROUTER_TEST_BIN)
+	./$(ROUTER_TEST_BIN)
+
+test: test-parser test-response test-filehandler test-mimetype test-integration test-router
 
 clean:
 	rm -rf obj
-	rm -f $(PARSER_TEST_BIN) $(RESPONSE_TEST_BIN) $(FILEHANDLER_TEST_BIN) $(MIMETYPE_TEST_BIN) $(INTEGRATION_TEST_BIN)
+	rm -f $(PARSER_TEST_BIN) $(RESPONSE_TEST_BIN) $(FILEHANDLER_TEST_BIN) $(MIMETYPE_TEST_BIN) $(INTEGRATION_TEST_BIN) $(ROUTER_TEST_BIN)
 
 fclean: clean
 	rm -f $(NAME)

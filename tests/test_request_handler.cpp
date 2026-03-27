@@ -38,7 +38,9 @@ int main()
     expectTrue(response.find("HTTP/1.1 400 Bad Request") != std::string::npos, "Malformed request returns 400");
 
     response = handler.buildResponseForRawRequest("HEAD / HTTP/1.1\r\nHost: localhost\r\n\r\n");
-    expectTrue(response.find("HTTP/1.1 405 Method Not Allowed") != std::string::npos, "Unsupported HEAD returns 405");
+    expectTrue(response.find("HTTP/1.1 200 OK") != std::string::npos, "HEAD / returns 200");
+    expectTrue(response.find("Content-Type: text/html") != std::string::npos, "HEAD / returns html content type");
+    expectTrue(response.find("Raja Backend Works!") == std::string::npos, "HEAD / omits response body");
 
     long_path.assign(MAX_URI_LENGTH + 5, 'a');
     response = handler.buildResponseForRawRequest("GET /" + long_path + " HTTP/1.1\r\nHost: localhost\r\n\r\n");

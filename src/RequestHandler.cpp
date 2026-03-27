@@ -1,5 +1,7 @@
 #include "../inc/RequestHandler.hpp"
 
+#include <sstream>
+
 RequestHandler::RequestHandler()
 {
 }
@@ -8,15 +10,10 @@ RequestHandler::~RequestHandler()
 {
 }
 
-std::string RequestHandler::_resolvePath(HttpRequest &request) const
-{
-    if (request.getPath() == "/")
-        return "public/index.html";
-    return "public" + request.getPath();
-}
-
 HttpResponse RequestHandler::_buildErrorResponse(int status_code) const
 {
+    if (status_code == 400)
+        return HttpResponse::badRequest();
     if (status_code == 404)
         return HttpResponse::notFound();
     if (status_code == 405)
@@ -32,7 +29,7 @@ std::string RequestHandler::buildResponseForRawRequest(const std::string &raw_re
 {
     HttpRequest request;
     HttpResponse response;
-    std::string file_path;
+    Route route_result;
     std::string body;
     std::string mime;
 
@@ -42,17 +39,31 @@ std::string RequestHandler::buildResponseForRawRequest(const std::string &raw_re
         return _buildErrorResponse(request.errorCode()).build(); // using build to convert HttpResponse to string
     if (!request.parsingCompleted())
         return HttpResponse::badRequest().build();
-    if (request.getMethod() != GET)
-        return HttpResponse::methodNotAllowed().build();
 
-    file_path = _resolvePath(request);
-    if (_file_handler.isDirectory(file_path))
+    route_result = _router.route(request);
+    if (route_result.error_code != 0)
+        return _buildErrorResponse(route_result.error_code).build();
+    if (route_result.type == ROUTE_CGI || route_result.type == ROUTE_WRITE_FILE || route_result.type == ROUTE_DELETE)
+        return HttpResponse::notImplemented().build();
+    if (route_result.type != ROUTE_STATIC_FILE)
+        return HttpResponse::internalError().build();
+    if (_file_handler.isDirectory(route_result.file_path))
         return HttpResponse::notFound().build();
-    if (!_file_handler.fileExists(file_path))
+    if (!_file_handler.fileExists(route_result.file_path))
         return HttpResponse::notFound().build();
 
-    body = _file_handler.getFileContents(file_path);
-    mime = _file_handler.getMimeType(file_path);
+    body = _file_handler.getFileContents(route_result.file_path);
+    mime = _file_handler.getMimeType(route_result.file_path);
+    if (request.getMethod() == HEAD)
+    {
+        std::ostringstream content_length;
+
+        content_length << body.length();
+        response.setStatus(200);
+        response.setHeader("Content-Type", mime);
+        response.setHeader("Content-Length", content_length.str());
+        return response.build();
+    }
     response = HttpResponse::ok(body, mime);
     return response.build();
 }
