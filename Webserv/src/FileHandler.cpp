@@ -52,31 +52,49 @@ std::string FileHandler::getFileContents(const std::string &path) const
 	return contents.str();
 }
 
-std::string FileHandler::getMimeType(const std::string& path) const {
-    size_t dot_pos = path.find_last_of('.');
-    if (dot_pos == std::string::npos)
-        return "application/octet-stream";
-    
-    std::string ext = path.substr(dot_pos + 1);
-    
-    if (ext == "html" || ext == "htm")
-        return "text/html";
-    else if (ext == "css")
-        return "text/css";
-    else if (ext == "js")
-        return "application/javascript";
-    else if (ext == "jpg" || ext == "jpeg")
-        return "image/jpeg";
-    else if (ext == "png")
-        return "image/png";
-    else if (ext == "gif")
-        return "image/gif";
-    else if (ext == "txt")
-        return "text/plain";
-    else if (ext == "json")
-        return "application/json";
-    else
-        return "application/octet-stream";
+std::string FileHandler::getMimeType(const std::string &path) const
+{
+	size_t dot_pos = path.find_last('.');
+	if (dot_pos == std::string::npos)
+	{
+		return "application/octet-stream";
+	}
+	std::string ext = path.substr(dot_pos + 1);
+	
+	if (ext == "html" || ext == "htm")
+	{
+		return "text/html";
+	}
+	else if (ext == "css")
+	{
+		return "text/css";
+	}
+	else if (ext == "js")
+	{
+		return "application/javascript";
+	}
+	else if (ext == "jpg" || ext == "jpeg")
+	{
+		return "image/jpeg";
+	}
+	else if (ext == "png")
+	{
+		return "image/png";
+	}
+	else if (ext == "gif")
+	{
+		return "image/gif";
+	}
+	else if (ext == "txt")
+	{
+		return "text/plain";
+	}
+	else if (ext == "json")
+	{
+		return "application/json";
+	}
+	else
+	{
+		return "application/octet-stream";
+	}
 }
-
-

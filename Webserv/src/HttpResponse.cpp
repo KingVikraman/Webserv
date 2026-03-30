@@ -130,6 +130,5 @@ HttpResponse HttpResponse::badRequest()
 	resp.setHeader("Content-Type" , "text/html");
 	resp.setBody("<html><body><h1>400 Bad Request</h1></body></html> ");
 	return resp;
-
 }
 
