@@ -2,7 +2,8 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -Werror -Wno-switch -std=c++98
 INCLUDES = -Iinc
 
-NAME = libwebserv.a
+SERVER_BIN = webserv
+SERVER_MAIN_SRC = app/main.cpp
 
 CFILES = $(wildcard src/*.cpp)
 OFILES = $(CFILES:src/%.cpp=obj/%.o)
@@ -20,10 +21,10 @@ INTEGRATION_TEST_BIN = tests/test_request_handler
 ROUTER_TEST_SRC = tests/test_router.cpp
 ROUTER_TEST_BIN = tests/test_router
 
-all: $(NAME)
+all: $(SERVER_BIN)
 
-$(NAME): $(OFILES)
-	ar rcs $(NAME) $(OFILES)
+$(SERVER_BIN): $(SERVER_MAIN_SRC) $(OFILES)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(SERVER_MAIN_SRC) $(OFILES) -o $(SERVER_BIN)
 
 obj/%.o: src/%.cpp
 	@mkdir -p obj
@@ -72,7 +73,7 @@ clean:
 	rm -f $(PARSER_TEST_BIN) $(RESPONSE_TEST_BIN) $(FILEHANDLER_TEST_BIN) $(MIMETYPE_TEST_BIN) $(INTEGRATION_TEST_BIN) $(ROUTER_TEST_BIN)
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(SERVER_BIN)
 
 re: fclean all
 

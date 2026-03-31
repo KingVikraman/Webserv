@@ -25,7 +25,7 @@ int main()
     response = handler.buildResponseForRawRequest("GET / HTTP/1.1\r\nHost: localhost\r\n\r\n");
     expectTrue(response.find("HTTP/1.1 200 OK") != std::string::npos, "GET / returns 200");
     expectTrue(response.find("Content-Type: text/html") != std::string::npos, "GET / returns html content type");
-    expectTrue(response.find("Raja Backend Works!") != std::string::npos, "GET / serves public/index.html");
+    expectTrue(response.find("Backend Works!") != std::string::npos, "GET / serves public/index.html");
 
     response = handler.buildResponseForRawRequest("GET /style.css HTTP/1.1\r\nHost: localhost\r\n\r\n");
     expectTrue(response.find("HTTP/1.1 200 OK") != std::string::npos, "GET /style.css returns 200");
@@ -40,7 +40,7 @@ int main()
     response = handler.buildResponseForRawRequest("HEAD / HTTP/1.1\r\nHost: localhost\r\n\r\n");
     expectTrue(response.find("HTTP/1.1 200 OK") != std::string::npos, "HEAD / returns 200");
     expectTrue(response.find("Content-Type: text/html") != std::string::npos, "HEAD / returns html content type");
-    expectTrue(response.find("Raja Backend Works!") == std::string::npos, "HEAD / omits response body");
+    expectTrue(response.find("Backend Works!") == std::string::npos, "HEAD / omits response body");
 
     long_path.assign(MAX_URI_LENGTH + 5, 'a');
     response = handler.buildResponseForRawRequest("GET /" + long_path + " HTTP/1.1\r\nHost: localhost\r\n\r\n");

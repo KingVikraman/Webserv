@@ -1,9 +1,145 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandatory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
-<body>
-    <h1>Raja Backend Works!</h1>
+<body class="min-h-screen bg-gradient-to-b from-zinc-100 via-zinc-200 to-zinc-300 text-zinc-900">
+    <main class="max-w-6xl mx-auto px-6 py-8">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h1 class="text-5xl font-extrabold tracking-tight">Mandatory</h1>
+                <p class="text-sm text-zinc-500 mt-2">Backend Works!</p>
+            </div>
+            <a href="/" class="bg-zinc-900 text-white rounded-md px-4 py-2 text-sm font-semibold hover:bg-zinc-700 transition">Home</a>
+        </div>
+
+        <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <article class="rounded-2xl bg-zinc-900 text-white p-5 shadow-xl shadow-zinc-700/30 ring-1 ring-zinc-800/60">
+                <h2 class="text-3xl font-black tracking-tight">GET</h2>
+                <div class="border-b border-zinc-700 my-3"></div>
+                <p class="text-lg leading-snug text-zinc-200">Try a simple GET method to display the homepage.</p>
+                <button data-action="navigate" data-path="/" class="try-btn mt-6 w-full rounded-lg bg-zinc-100 text-zinc-900 text-xl font-semibold py-2.5 hover:bg-white transition">Try</button>
+            </article>
+
+            <article class="rounded-2xl bg-zinc-900 text-white p-5 shadow-xl shadow-zinc-700/30 ring-1 ring-zinc-800/60">
+                <h2 class="text-3xl font-black tracking-tight">POST</h2>
+                <div class="border-b border-zinc-700 my-3"></div>
+                <p class="text-lg leading-snug text-zinc-200">Try a POST method call to your upload route.</p>
+                <button data-action="request" data-method="POST" data-path="/upload/demo.txt" class="try-btn mt-6 w-full rounded-lg bg-zinc-100 text-zinc-900 text-xl font-semibold py-2.5 hover:bg-white transition">Try</button>
+            </article>
+
+            <article class="rounded-2xl bg-zinc-900 text-white p-5 shadow-xl shadow-zinc-700/30 ring-1 ring-zinc-800/60">
+                <h2 class="text-3xl font-black tracking-tight">DELETE</h2>
+                <div class="border-b border-zinc-700 my-3"></div>
+                <p class="text-lg leading-snug text-zinc-200">Try deleting a file path on the server.</p>
+                <button data-action="request" data-method="DELETE" data-path="/upload/demo.txt" class="try-btn mt-6 w-full rounded-lg bg-zinc-100 text-zinc-900 text-xl font-semibold py-2.5 hover:bg-white transition">Try</button>
+            </article>
+
+            <article class="rounded-2xl bg-zinc-900 text-white p-5 shadow-xl shadow-zinc-700/30 ring-1 ring-zinc-800/60">
+                <h2 class="text-3xl font-black tracking-tight">UPLOAD</h2>
+                <div class="border-b border-zinc-700 my-3"></div>
+                <p class="text-lg leading-snug text-zinc-200">Upload a file to the server (demo request).</p>
+                <button data-action="request" data-method="POST" data-path="/upload/file.txt" class="try-btn mt-6 w-full rounded-lg bg-zinc-100 text-zinc-900 text-xl font-semibold py-2.5 hover:bg-white transition">Try</button>
+            </article>
+
+            <article class="rounded-2xl bg-zinc-900 text-white p-5 shadow-xl shadow-zinc-700/30 ring-1 ring-zinc-800/60">
+                <h2 class="text-3xl font-black tracking-tight">DOWNLOAD</h2>
+                <div class="border-b border-zinc-700 my-3"></div>
+                <p class="text-lg leading-snug text-zinc-200">Get back files you just uploaded.</p>
+                <button data-action="navigate" data-path="/upload/demo.txt" class="try-btn mt-6 w-full rounded-lg bg-zinc-100 text-zinc-900 text-xl font-semibold py-2.5 hover:bg-white transition">Try</button>
+            </article>
+
+            <article class="rounded-2xl bg-zinc-900 text-white p-5 shadow-xl shadow-zinc-700/30 ring-1 ring-zinc-800/60">
+                <h2 class="text-3xl font-black tracking-tight">FILETRANSFER</h2>
+                <div class="border-b border-zinc-700 my-3"></div>
+                <p class="text-lg leading-snug text-zinc-200">Upload, download, and delete files natively.</p>
+                <button data-action="request" data-method="PUT" data-path="/upload/demo.txt" class="try-btn mt-6 w-full rounded-lg bg-zinc-100 text-zinc-900 text-xl font-semibold py-2.5 hover:bg-white transition">Try</button>
+            </article>
+
+            <article class="rounded-2xl bg-zinc-900 text-white p-5 shadow-xl shadow-zinc-700/30 ring-1 ring-zinc-800/60">
+                <h2 class="text-3xl font-black tracking-tight">List Directory</h2>
+                <div class="border-b border-zinc-700 my-3"></div>
+                <p class="text-lg leading-snug text-zinc-200">List files from a target directory route.</p>
+                <button data-action="navigate" data-path="/list" class="try-btn mt-6 w-full rounded-lg bg-zinc-100 text-zinc-900 text-xl font-semibold py-2.5 hover:bg-white transition">Try</button>
+            </article>
+
+            <article class="rounded-2xl bg-zinc-900 text-white p-5 shadow-xl shadow-zinc-700/30 ring-1 ring-zinc-800/60">
+                <h2 class="text-3xl font-black tracking-tight">Redirection</h2>
+                <div class="border-b border-zinc-700 my-3"></div>
+                <p class="text-lg leading-snug text-zinc-200">Test your 301 redirect behavior.</p>
+                <button data-action="navigate" data-path="/redirect" class="try-btn mt-6 w-full rounded-lg bg-zinc-100 text-zinc-900 text-xl font-semibold py-2.5 hover:bg-white transition">Try</button>
+            </article>
+
+            <article class="rounded-2xl bg-zinc-900 text-white p-5 shadow-xl shadow-zinc-700/30 ring-1 ring-zinc-800/60">
+                <h2 class="text-3xl font-black tracking-tight">Custom Error Pages</h2>
+                <div class="border-b border-zinc-700 my-3"></div>
+                <p class="text-lg leading-snug text-zinc-200">Display custom 404 error pages.</p>
+                <button data-action="navigate" data-path="/missing-page" class="try-btn mt-6 w-full rounded-lg bg-zinc-100 text-zinc-900 text-xl font-semibold py-2.5 hover:bg-white transition">Try</button>
+            </article>
+
+            <article class="rounded-2xl bg-zinc-900 text-white p-5 shadow-xl shadow-zinc-700/30 ring-1 ring-zinc-800/60">
+                <h2 class="text-3xl font-black tracking-tight">Alias</h2>
+                <div class="border-b border-zinc-700 my-3"></div>
+                <p class="text-lg leading-snug text-zinc-200">Display banane.html with alias path.</p>
+                <button data-action="navigate" data-path="/alias/banane.html" class="try-btn mt-6 w-full rounded-lg bg-zinc-100 text-zinc-900 text-xl font-semibold py-2.5 hover:bg-white transition">Try</button>
+            </article>
+        </section>
+
+    </main>
+    <script>
+        (function () {
+            var buttons = document.querySelectorAll(".try-btn");
+
+            function showToast(text, ok) {
+                Toastify({
+                    text: text,
+                    duration: 2600,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    style: {
+                        background: ok ? "linear-gradient(to right, #16a34a, #15803d)" : "linear-gradient(to right, #dc2626, #b91c1c)"
+                    }
+                }).showToast();
+            }
+
+            function sendRequest(method, path) {
+                fetch(path, {
+                    method: method,
+                    headers: {"Content-Type": "text/plain"},
+                    body: (method === "POST" || method === "PUT") ? "demo payload" : null
+                })
+                .then(function (res) {
+                    var ok = (res.status >= 200 && res.status < 300);
+                    showToast(method + " " + path + " -> HTTP " + res.status, ok);
+                })
+                .catch(function (err) {
+                    showToast(method + " " + path + " failed: " + err.message, false);
+                });
+            }
+
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener("click", function () {
+                    var action = this.getAttribute("data-action");
+                    var path = this.getAttribute("data-path");
+                    var method = this.getAttribute("data-method") || "GET";
+
+                    if (action === "navigate")
+                    {
+                        showToast("Opening " + path, true);
+                        window.location.href = path;
+                    }
+                    else
+                        sendRequest(method, path);
+                });
+            }
+        })();
+    </script>
 </body>
 </html>
