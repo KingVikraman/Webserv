@@ -6,7 +6,7 @@
 /*   By: zernest <zernest@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 22:48:33 by zernest           #+#    #+#             */
-/*   Updated: 2026/03/18 23:19:00 by zernest          ###   ########.fr       */
+/*   Updated: 2026/04/02 21:21:44 by zernest          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,54 @@ void configParse::expect(const std::string &expected)
 		exit(1);
 	}
 	next();
+}
+
+void configParse::parseLocation(ServerConfig &server)
+{
+	LocationConfig location;
+
+	if (peek() == ";")
+	{
+		std::cerr << "Error: missing location path\n";
+		exit(1);
+	}
+
+	location.path = next();
+	expect("{");
+	
+	while (peek() != "}")
+	{
+		if (peek() == "allow_methods")
+		{
+			next();
+			while (peek() != ";")
+			{
+				location.methods.push_back(next());
+			}
+			expect(";");
+		}
+
+		else if (peek() == "root")
+		{
+			next();
+			if (peek() == ";")
+			{
+				std::cerr << "Error: missing root in location\n";
+				exit(1);
+			}
+			location.root = next();
+			expect(";");
+		}
+
+		else
+		{
+			std::cerr << "Error: unknown directive '" << peek() << "' in location\n";
+			exit(1);
+		}
+	}
+
+	expect("{");
+	server.locations.push_back(location);
 }
 
 void configParse::parseServer()
@@ -98,7 +146,7 @@ void configParse::parseServer()
 		else if (peek() == "location")
 		{
 			next(); // consume "location"
-			std::cout << "Found location block\n";
+			parseLocation(server);
 		}
 		else
 		{
