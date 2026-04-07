@@ -6,7 +6,7 @@
 /*   By: zernest <zernest@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 20:55:06 by zernest           #+#    #+#             */
-/*   Updated: 2026/03/12 22:18:59 by zernest          ###   ########.fr       */
+/*   Updated: 2026/04/07 17:19:02 by zernest          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,19 +23,22 @@
 class LocationConfig
 {
 public:
+	LocationConfig();
 	std::string path;
-	std::vector<std::string> methods;
 	std::string root;
-	std::string index;
+	std::string upload_store;
+	std::vector<std::string> methods;
+	std::vector<std::string> index;
+	bool autoindex;
 };
 
 class ServerConfig
 {
 public:
 	int port;
-	std::string server_name;
+	std::vector<std::string> server_names;
+	std::vector<std::string> index;
 	std::string root;
-	std::string index;
 	size_t client_max_body_size;
 
 	std::map<int, std::string> error_pages;
@@ -44,5 +47,6 @@ public:
 
 std::string readFile(const std::string& filename);
 std::vector<std::string> tokenize(const std::string &text);
+void printConfig(const std::vector<ServerConfig> &servers);
 
 #endif

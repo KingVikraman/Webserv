@@ -6,7 +6,7 @@
 /*   By: zernest <zernest@student.42kl.edu.my>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 22:48:33 by zernest           #+#    #+#             */
-/*   Updated: 2026/04/02 21:21:44 by zernest          ###   ########.fr       */
+/*   Updated: 2026/04/07 17:19:27 by zernest          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,41 @@ void configParse::parseLocation(ServerConfig &server)
 			location.root = next();
 			expect(";");
 		}
-
+		else if (peek() == "upload_store")
+		{
+			next();
+			if (peek() == ";")
+			{
+				std::cerr << "Error: missing upload_store in location\n";
+				exit(1);
+			}
+			location.upload_store = next();
+			expect(";");
+		}
+		else if (peek() == "index")
+		{
+			next();
+			while (peek() != ";")
+			{
+				location.index.push_back(next());
+			}
+			expect(";");
+		}
+		else if (peek() == "autoindex")
+		{
+			next();
+			if (peek() == "on")
+				location.autoindex = true;
+			else if (peek() == "off")
+				location.autoindex = false;
+			else
+			{
+				std::cerr << "Error: autoindex must be 'on' or 'off'\n";
+				exit(1);
+			}
+			next();
+			expect(";");
+		}
 		else
 		{
 			std::cerr << "Error: unknown directive '" << peek() << "' in location\n";
@@ -79,7 +113,7 @@ void configParse::parseLocation(ServerConfig &server)
 		}
 	}
 
-	expect("{");
+	expect("}");
 	server.locations.push_back(location);
 }
 
@@ -113,8 +147,10 @@ void configParse::parseServer()
 				std::cerr << "Error: missing server name.\n";
 				exit(1);
 			}
-			std::string serverStr = next();
-			server.server_name = serverStr;
+			while (peek() != ";")
+			{
+				server.server_names.push_back(next());
+			}
 			expect(";");
 		}
 		else if (peek() == "root")
@@ -139,13 +175,28 @@ void configParse::parseServer()
 				std::cerr << "Error: missing index.\n";
 				exit(1);
 			}
-			std::string indexStr = next();
-			server.index = indexStr;
+			while (peek() != ";")
+			{
+				server.index.push_back(next());
+			}
+			expect(";");
+		}
+		else if (peek() == "client_max_body_size")
+		{
+			next();
+			
+			if (peek() == ";")
+			{
+				std::cerr << "Error: missing value for client_max_body_size.\n";
+				exit(1);
+			}
+			std::string client_sizeStr = next();
+			server.client_max_body_size = std::atoi(client_sizeStr.c_str());
 			expect(";");
 		}
 		else if (peek() == "location")
 		{
-			next(); // consume "location"
+			next();
 			parseLocation(server);
 		}
 		else
