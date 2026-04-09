@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Method Test Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--gold:#C9A84C;--gold-bright:#F2D48B;--carbon:#080B0F;--panel:rgba(14,18,24,0.90);--panel2:rgba(20,25,32,0.95);--border:rgba(201,168,76,0.28);--border-hot:rgba(201,168,76,0.75);--text:rgba(230,235,242,0.92);--muted:rgba(180,188,200,0.55);--ok:#3DDB87;--err:#FF5470;--info:#5BB8FF;}
+*{box-sizing:border-box;}body{margin:0;font-family:"Rajdhani",sans-serif;background:#080B0F;color:var(--text);min-height:100vh;background-image:repeating-linear-gradient(45deg,#080B0F 0px,#080B0F 10px,#0B0E14 10px,#0B0E14 20px);} .wrap{max-width:980px;margin:0 auto;padding:2rem 1rem;} .panel{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:1rem;padding:1.3rem;box-shadow:0 16px 45px rgba(0,0,0,.55);} .display{font-family:"Orbitron",sans-serif;color:var(--gold-bright);} .small{color:var(--muted);} .btn{display:inline-flex;align-items:center;justify-content:center;padding:.65rem 1.2rem;border-radius:.6rem;border:1px solid var(--border);background:linear-gradient(140deg,rgba(201,168,76,.15),rgba(201,168,76,.04));color:var(--gold-bright);font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:.2s;} .btn:hover{transform:translateY(-2px);border-color:var(--border-hot);} .field{width:100%;padding:.7rem .9rem;border-radius:.55rem;border:1px solid rgba(201,168,76,.3);background:rgba(5,8,13,.7);color:var(--text);} .row{display:grid;grid-template-columns:1fr auto;gap:.6rem;} #toasts{position:fixed;top:1rem;right:1rem;display:flex;flex-direction:column;gap:8px;width:min(92vw,320px);} .toast{border-radius:.7rem;padding:.75rem .9rem;border:1px solid rgba(255,255,255,.1);background:rgba(10,13,20,.94);} 
+</style>
+</head>
+<body>
+<div id="toasts"></div>
+<div class="wrap">
+  <div class="panel" style="margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;">
+    <div><h1 class="display" style="font-size:1.3rem;">METHOD TEST CONSOLE</h1><p class="small">Quick GET/POST/DELETE checks.</p></div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;"><a class="btn" href="/">Hero</a><a class="btn" href="/upload.html">Upload</a><a class="btn" href="/delete.html">Delete</a><a class="btn" href="/list">List</a></div>
+  </div>
+
+  <div class="panel" style="display:grid;gap:1rem;">
+    <div>
+      <p class="small" style="margin-bottom:.4rem;">GET path</p>
+      <div class="row"><input id="getPath" class="field" value="/"/><button id="getBtn" class="btn">GET</button></div>
+      <p id="getResp" class="small" style="margin-top:.5rem;"></p>
+    </div>
+    <div>
+      <p class="small" style="margin-bottom:.4rem;">POST text</p>
+      <div class="row"><input id="postPath" class="field" value="/uploads/"/><button id="postBtn" class="btn">POST</button></div>
+      <p id="postResp" class="small" style="margin-top:.5rem;"></p>
+    </div>
+    <div>
+      <p class="small" style="margin-bottom:.4rem;">DELETE path</p>
+      <div class="row"><input id="delPath" class="field" placeholder="/uploads/Picture_1.png"/><button id="delBtn" class="btn">DELETE</button></div>
+      <p id="delResp" class="small" style="margin-top:.5rem;"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+function toast(msg,color){var t=document.createElement('div');t.className='toast';t.style.color=color||'var(--info)';t.textContent=msg;document.getElementById('toasts').appendChild(t);setTimeout(function(){t.remove();},2600);} 
+
+document.getElementById('getBtn').addEventListener('click',async function(){
+  var path=document.getElementById('getPath').value||'/';
+  try{var r=await fetch(path);document.getElementById('getResp').textContent='HTTP '+r.status;toast('GET '+path+' -> '+r.status,r.ok?'var(--ok)':'var(--err)');}
+  catch(e){toast('GET failed','var(--err)');}
+});
+
+document.getElementById('postBtn').addEventListener('click',async function(){
+  var path=document.getElementById('postPath').value||'/uploads/';
+  try{var r=await fetch(path,{method:'POST',headers:{'Content-Type':'text/plain'},body:'demo payload'});document.getElementById('postResp').textContent='HTTP '+r.status;toast('POST '+path+' -> '+r.status,r.ok?'var(--ok)':'var(--err)');}
+  catch(e){toast('POST failed','var(--err)');}
+});
+
+document.getElementById('delBtn').addEventListener('click',async function(){
+  var path=document.getElementById('delPath').value.trim();
+  if(!path){toast('Enter delete path','var(--err)');return;}
+  try{var r=await fetch(path,{method:'DELETE'});document.getElementById('delResp').textContent='HTTP '+r.status;toast('DELETE '+path+' -> '+r.status,(r.status===200||r.status===204)?'var(--ok)':'var(--err)');}
+  catch(e){toast('DELETE failed','var(--err)');}
+});
+</script>
+</body>
+</html>

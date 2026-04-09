@@ -2,7 +2,7 @@
 #define CGIHANDLER_HPP
 
 
-#include "HttpRequest.hpp"
+#include "../../Brian/includes/HttpRequest.hpp"
 #include <sys/wait.h>
 #include <iostream>
 #include <unistd.h>
@@ -31,6 +31,3 @@ class CgiHandler {
 };
 
 #endif
-
-
-

@@ -172,4 +172,3 @@ std::string CgiHandler:: execute(const std::string& script_path, HttpRequest & r
 		return output;
 	}
 }
-

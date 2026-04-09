@@ -1,4 +1,4 @@
-#include "../includes/HttpRequest.hpp"
+#include "HttpRequest.hpp"
 
 // Helper func
 
@@ -16,7 +16,7 @@ void toLower(std::string &str)
         str[i] = std::tolower(str[i]);
 }
 
-bool validUriChar(uint8_t ch)
+bool validUriChar(u_int8_t ch)
 {
     if ((ch >= '#' && ch <= ';') || (ch >= '?' && ch <= '[') || (ch >= 'a' && ch <= 'z') ||
         ch == '!' || ch == '=' || ch == ']' || ch == '_' || ch == '~')
@@ -26,8 +26,8 @@ bool validUriChar(uint8_t ch)
 
 bool invalidUriPosition(std::string path) // prevent path from going before root
 {
-    std::string tmp(path);
-    char *res = strtok((char *)tmp.c_str(), "/"); // tokenize the path by '/'
+    char *buf = &path[0]; // mutable buffer backed by std::string storage
+    char *res = strtok(buf, "/"); // tokenize the path by '/'
     int pos = 0;
     while (res != NULL)
     {
@@ -42,7 +42,7 @@ bool invalidUriPosition(std::string path) // prevent path from going before root
     return (0);
 }
 
-bool isToken(uint8_t ch)
+bool isToken(u_int8_t ch)
 {
     if (ch == '!' || (ch >= '#' && ch <= '\'') || ch == '*' || ch == '+' || ch == '-' || ch == '.' ||
         (ch >= '0' && ch <= '9') || (ch >= 'A' && ch <= 'Z') || (ch >= '^' && ch <= '`') ||
@@ -595,7 +595,7 @@ void HttpRequest::feed(const char *data, size_t size)
                 s << character;
                 s >> std::hex >> _chunk_length; // convert hex string to decimal number
                 if (_chunk_length == 0)
-                    _state = Chunked_Length_CR; // if no more then expecxt CRLF to end chunked body
+                    _state = Chunked_Length_CR; // if no more then expect CRLF to end chunked body
                 else
                     _state = Chunked_Length;
                 continue;
@@ -616,6 +616,13 @@ void HttpRequest::feed(const char *data, size_t size)
                     _state = Chunked_Length_LF;
                 else
                     _state = Chunked_Ignore;
+                continue;
+            }
+            case Chunked_Ignore:
+            {
+                // Ignore chunk extensions until end of line
+                if (character == '\r')
+                    _state = Chunked_Length_LF;
                 continue;
             }
             case Chunked_Length_CR:
@@ -645,6 +652,39 @@ void HttpRequest::feed(const char *data, size_t size)
                     std::cout << "Bad Character (Chunked_Length_LF)" << std::endl;
                     return;
                 }
+                continue;
+            }
+            case Chunked_Data:
+            {
+                if (_chunk_length > 0)
+                {
+                    _body.push_back(character);
+                    --_chunk_length;
+                }
+                if (_chunk_length == 0)
+                    _state = Chunked_Data_CR;
+                break;
+            }
+            case Chunked_Data_CR:
+            {
+                if (character != '\r')
+                {
+                    _error_code = 400;
+                    std::cout << "Bad Character (Chunked_Data_CR)" << std::endl;
+                    return;
+                }
+                _state = Chunked_Data_LF;
+                continue;
+            }
+            case Chunked_Data_LF:
+            {
+                if (character != '\n')
+                {
+                    _error_code = 400;
+                    std::cout << "Bad Character (Chunked_Data_LF)" << std::endl;
+                    return;
+                }
+                _state = Chunked_Length_Begin;
                 continue;
             }
             case Chunked_End_CR:

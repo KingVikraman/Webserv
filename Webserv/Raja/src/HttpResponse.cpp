@@ -83,7 +83,7 @@ HttpResponse HttpResponse::ok(const std::string &body, const std::string &conten
 HttpResponse HttpResponse::created(const std::string &body)
 {
 	HttpResponse resp;
-	resp.setStatus(301);
+	resp.setStatus(201);
 	resp.setHeader("Content-Type", "text/plain");
 	resp.setBody(body);
 	return resp;
@@ -119,7 +119,7 @@ HttpResponse HttpResponse::internalError()
 	HttpResponse resp;
 	resp.setStatus(500);
 	resp.setHeader("Content-Type" , "text/html");
-	resp.setBody("<html><body><h1>500 Intenal Server Error</h1></body></html> ");
+	resp.setBody("<html><body><h1>500 Internal Server Error</h1></body></html>");
 	return resp;
 }
 
@@ -128,7 +128,6 @@ HttpResponse HttpResponse::badRequest()
 	HttpResponse resp;
 	resp.setStatus(400);
 	resp.setHeader("Content-Type" , "text/html");
-	resp.setBody("<html><body><h1>400 Bad Request</h1></body></html> ");
+	resp.setBody("<html><body><h1>400 Bad Request</h1></body></html>");
 	return resp;
 }
-

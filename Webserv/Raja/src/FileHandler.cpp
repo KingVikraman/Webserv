@@ -54,7 +54,7 @@ std::string FileHandler::getFileContents(const std::string &path) const
 
 std::string FileHandler::getMimeType(const std::string &path) const
 {
-	size_t dot_pos = path.find_last('.');
+	size_t dot_pos = path.find_last_of('.');
 	if (dot_pos == std::string::npos)
 	{
 		return "application/octet-stream";
