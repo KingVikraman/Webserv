@@ -22,10 +22,10 @@
 - `telnet github.com 80`
 
 **Questions to answer:**
-- [ ] What does `HTTP/1.1 200 OK` mean?
-- [ ] What are headers?
-- [ ] Where does the body start?
-- [ ] What happens if you forget `Host:` header?
+- [✅] What does `HTTP/1.1 200 OK` mean?
+- [✅] What are headers?
+- [✅] Where does the body start?
+- [✅] What happens if you forget `Host:` header?
 
 **Deliverable:** Both can draw HTTP request/response format on paper from memory.
 
@@ -52,8 +52,8 @@ GET / HTTP/1.1
 ```
 
 **Questions:**
-- [ ] What does `404 Not Found` mean?
-- [ ] Why is `Host:` header required?
-- [ ] What's the difference between GET and POST?
+- [✅] What does `404 Not Found` mean?
+- [✅] Why is `Host:` header required?
+- [✅] What's the difference between GET and POST?
 
 ---
