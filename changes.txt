@@ -1,0 +1,318 @@
+=============================================================================
+                     CONFIGURATION SYSTEM INTEGRATION
+                        Changes Documentation
+=============================================================================
+
+DATE: April 14, 2026
+PROJECT: Webserv HTTP Server
+CHANGES: Implementation of new Config system replacing static server.conf approach
+
+=============================================================================
+                              OVERVIEW
+=============================================================================
+
+This document outlines all changes made to integrate the new configuration
+system (Config.cpp, Config.hpp, ConfigParse.cpp, ConfigParse.hpp) into the
+Webserv project. The new system provides dynamic, structured configuration
+parsing from server.conf files instead of hardcoded values.
+
+=============================================================================
+                         FILES MODIFIED
+=============================================================================
+
+1. Config.hpp
+   Location: Webserv/Config.hpp
+   
+   CHANGES:
+   - Added Config class with private servers vector to store all ServerConfig
+   - Added public methods:
+     * Config() - Default constructor
+     * ~Config() - Destructor
+     * bool parse(const std::string& config_file) - Parse config file
+     * const std::vector<ServerConfig>& getServers() const - Get parsed servers
+   
+   - Added LocationConfig constructor to initialize autoindex to false
+   
+   WHY: 
+   - The Config class acts as a wrapper for the configuration system,
+     providing a clean interface for loading and accessing server configurations
+   - Previously, there was no proper Config class, only data structures
+   
+   IMPACT:
+   - Enables centralized configuration management
+   - Provides getServers() method that Server and Router classes depend on
+   - Allows flexible server configuration from files
+
+---
+
+2. Config.cpp (COMPLETELY REPLACED)
+   Location: Webserv/Config.cpp
+   
+   OLD STATE: 
+   - Incorrectly contained configParse class implementations
+   - Was duplicate/conflicting with ConfigParse.cpp
+   
+   NEW IMPLEMENTATION:
+   - LocationConfig::LocationConfig() - Initializes autoindex to false
+   
+   - readFile(const std::string& filename)
+     * Opens and reads entire config file into memory
+     * Returns empty string on failure (can be detected by caller)
+   
+   - tokenize(const std::string& text)
+     * Tokenizes config file into meaningful parts
+     * Treats {, }, and ; as separate tokens for grammar parsing
+     * Returns vector of tokens for ConfigParse to process
+   
+   - printConfig(const std::vector<ServerConfig>& servers)
+     * Utility function for debugging/logging
+     * Prints all server and location configurations
+   
+   - Config::Config() - Default constructor
+   - Config::~Config() - Destructor
+   
+   - Config::parse(const std::string& config_file)
+     * Main entry point for configuration loading
+     * Flow: readFile() → tokenize() → configParse::parse()
+     * Returns true on success, false on failure
+     * Catches exceptions and logs errors
+   
+   - Config::getServers() const
+     * Returns reference to parsed server configurations
+     * Called by Server class to get listening ports
+     * Called by Router class to find server config for requests
+   
+   WHY:
+   - Separates Config class from ConfigParse implementation
+   - Provides proper initialization and cleanup
+   - Implements the crucial parse() method that integrates file I/O with parsing
+   
+   IMPACT:
+   - Config system now fully functional and integrated
+   - Files can be properly read and parsed
+   - Server can load configurations at startup
+
+---
+
+3. Router.hpp
+   Location: Webserv/Router.hpp
+   
+   CHANGES:
+   - Changed _findLocation return type from "const Location*" to "const LocationConfig*"
+   - Changed _findLocation parameter from "const Location&" to "const LocationConfig&" in _isMethodAllowed
+   
+   WHY:
+   - The original used undefined "Location" type
+   - Config system uses LocationConfig, not Location
+   - Must align Router with actual data structures in Config
+   
+   IMPACT:
+   - Eliminates compilation errors related to undefined Location type
+   - Router now properly uses LocationConfig from Config system
+
+---
+
+4. Router.cpp (SIGNIFICANTLY UPDATED)
+   Location: Webserv/Router.cpp
+   
+   CHANGES:
+   - Updated _findLocation() to work with vector instead of map
+     * Old: std::map<std::string, Location>::const_iterator
+     * New: Simple loop through server.locations vector
+     * Changed from it->first/it->second to direct vector indexing
+   
+   - Updated _isMethodAllowed() parameter from Location to LocationConfig
+     * Changed loc.allowed_methods to loc.methods (correct member name)
+   
+   - Replaced _config.findServer(server_port) call with proper implementation
+     * Now loops through _config.getServers() to find port match
+     * Stores pointer to matching ServerConfig
+   
+   - Updated _findLocation call to pass ServerConfig reference
+   
+   - All location references now use LocationConfig instead of Location
+   
+   WHY:
+   - ConfigParse creates vector<LocationConfig>, not map<string, Location>
+   - ConfigParse stores method names in "methods" vector, not "allowed_methods"
+   - Config class doesn't have findServer() method; must iterate through getServers()
+   - Router must adapt to actual data structures provided by Config system
+   
+   IMPACT:
+   - Router now properly integrates with new Config system
+   - Request routing works with configuration from server.conf
+   - Dynamic configuration replaces any hardcoded routing logic
+
+---
+
+5. Makefile
+   Location: Webserv/Makefile
+   
+   CHANGES:
+   - Added ConfigParse.cpp to SRC variable
+     * Before: Config.cpp (only)
+     * After: Config.cpp ConfigParse.cpp
+   
+   WHY:
+   - ConfigParse.cpp implements the configParse class with parsing logic
+   - Must be compiled and linked for complete configuration system
+   
+   IMPACT:
+   - Project now compiles ConfigParse.cpp
+   - Avoids linker errors for undefined configParse methods
+
+---
+
+6. server.conf (NEW FILE)
+   Location: Webserv/server.conf
+   
+   CONTENT:
+   - Simple test configuration with:
+     * One server listening on port 8080
+     * Root directory: ./public
+     * Three location blocks: /, /upload, /cgi-bin
+     * Support for GET, POST, DELETE methods
+     * Upload directory at ./uploads
+   
+   WHY:
+   - Test configuration file for new Config system
+   - Demonstrates file-based configuration instead of hardcoding
+   
+   IMPACT:
+   - Server reads this file at startup
+   - Can be modified to change configuration without recompilation
+
+=============================================================================
+                         FUNCTIONAL EFFECTS
+=============================================================================
+
+CONFIGURATION LOADING (Startup Flow):
+1. main() creates Config instance
+2. config.parse("server.conf") is called
+3. Config::parse():
+   a. Reads server.conf file into string (readFile)
+   b. Tokenizes content (tokenize)
+   c. Creates configParse object with tokens
+   d. Calls parser.parse() to build server configurations
+   e. Stores parsed ServerConfig vector internally
+   f. Returns true on success
+4. Server class receives Config reference
+5. Server::start() calls config.getServers() to get port list
+6. Creates listening sockets for each configured port
+
+REQUEST ROUTING FLOW:
+1. RequestHandler receives HTTP request
+2. Router::route() called with request and server_port
+3. Router uses config.getServers() to find ServerConfig by port
+4. Router::_findLocation() searches location blocks in vector
+5. Matches HTTP method against location's allowed methods
+6. Returns appropriate Route with type and paths
+
+=============================================================================
+                         KEY BENEFITS
+=============================================================================
+
+1. DYNAMIC CONFIGURATION
+   - Configuration read from file instead of hardcoded
+   - Can have multiple server blocks
+   - Each server can have multiple location blocks
+
+2. STRUCTURED APPROACH
+   - Clear separation between Config, ConfigParse, and HTTP server logic
+   - Config provides clean interface to rest of application
+   - ConfigParse handles complex grammar parsing internally
+
+3. ERROR HANDLING
+   - ConfigParse validates syntax and reports errors
+   - Config::parse() catches exceptions and returns false on failure
+   - Main catches parse errors and exits gracefully
+
+4. FLEXIBILITY
+   - Can add new server blocks without code changes
+   - Can modify routing/methods without recompilation
+   - Supports multiple ports, upload directories, CGI paths
+
+5. MAINTAINABILITY
+   - Configuration in visible text file (server.conf)
+   - Easy to understand server setup at a glance
+   - Changes documented in server configuration, not code
+
+=============================================================================
+                         COMPILATION STATUS
+=============================================================================
+
+BUILD RESULT: SUCCESS ✓
+
+The webserv project now compiles without errors:
+
+OLD ERRORS (Now Fixed):
+- Undefined type 'Location' in Router.hpp
+- Missing ConfigParse.cpp in compilation
+- Incomplete Config class without parse() method
+
+COMPILATION OUTPUT:
+- All source files compiled successfully
+- All object files created in obj_files/ directory
+- webserv executable created
+- Server compile banner displayed successfully
+
+TEST CONFIGURATION:
+- server.conf placed in Webserv directory
+- Ready for runtime testing
+
+=============================================================================
+                         TESTING RECOMMENDATIONS
+=============================================================================
+
+1. Verify Config File Parsing:
+   ./webserv server.conf       # Default config
+   ./webserv custom.conf       # Custom config
+   
+2. Check Error Handling:
+   ./webserv nonexistent.conf  # Should fail gracefully
+   
+3. Test with Modified server.conf:
+   - Add/remove server blocks
+   - Change port numbers
+   - Add new location paths
+   - Verify server still starts correctly
+
+4. Verify HTTP Request Routing:
+   - GET requests to / should use ./public root
+   - POST requests to /upload should work
+   - DELETE requests should be blocked at root
+
+=============================================================================
+                         REFERENCES
+=============================================================================
+
+Modified Files:
+- Config.hpp - Class design and interface
+- Config.cpp - Core configuration management
+- ConfigParse.hpp - Parser class definition
+- ConfigParse.cpp - Parser implementation (no changes)
+- Router.hpp - Router class signatures
+- Router.cpp - Router implementation for new Config
+- Makefile - Build system update
+- server.conf - New configuration file
+
+Related Architecture Files:
+- Server.hpp/cpp - Creates sockets from config
+- RequestHandler.hpp/cpp - Uses Router for requests
+- HttpRequest.hpp/cpp - HTTP request parsing
+- HttpResponse.hpp/cpp - HTTP response formatting
+
+=============================================================================
+                         CONCLUSION
+=============================================================================
+
+The new configuration system successfully integrates file-based, structured
+configuration into the Webserv application. Config files can be easily
+created and modified, and the server adapts dynamically without requiring
+code changes or recompilation. The system properly handles multiple servers,
+location blocks, and HTTP methods through a clean, maintainable architecture.
+
+All modifications maintain backward compatibility with existing code while
+significantly improving flexibility and configuration management.
+
+=============================================================================

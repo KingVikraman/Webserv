@@ -4,14 +4,13 @@
 Router::Router(const Config& config) : _config(config) {}
 Router::~Router() {}
 
-const Location* Router::_findLocation(const ServerConfig& server, const std::string& path) const {
-    const Location* best_match = NULL;
+const LocationConfig* Router::_findLocation(const ServerConfig& server, const std::string& path) const {
+    const LocationConfig* best_match = NULL;
     size_t best_length = 0;
     
-    for (std::map<std::string, Location>::const_iterator it = server.locations.begin();
-         it != server.locations.end(); ++it) {
-        
-        const std::string& loc_path = it->first;
+    for (size_t i = 0; i < server.locations.size(); i++) {
+        const LocationConfig& loc = server.locations[i];
+        const std::string& loc_path = loc.path;
         
         // Check if request path starts with location path on a segment boundary
         // so /upload does not match /upload.html.
@@ -28,7 +27,7 @@ const Location* Router::_findLocation(const ServerConfig& server, const std::str
 
         if (is_prefix && is_boundary) {
             if (loc_path.length() > best_length) {
-                best_match = &it->second;
+                best_match = &loc;
                 best_length = loc_path.length();
             }
         }
@@ -37,12 +36,12 @@ const Location* Router::_findLocation(const ServerConfig& server, const std::str
     return best_match;
 }
 
-bool Router::_isMethodAllowed(const Location& loc, const std::string& method) const {
-    if (loc.allowed_methods.empty())
+bool Router::_isMethodAllowed(const LocationConfig& loc, const std::string& method) const {
+    if (loc.methods.empty())
         return true;
     
-    for (size_t i = 0; i < loc.allowed_methods.size(); i++) {
-        if (loc.allowed_methods[i] == method)
+    for (size_t i = 0; i < loc.methods.size(); i++) {
+        if (loc.methods[i] == method)
             return true;
     }
     
@@ -60,15 +59,24 @@ Route Router::route(HttpRequest& request, int server_port) const {
     Route result;
     const std::string request_path = request.getPath();
     
-    // Find server
-    const ServerConfig* server = _config.findServer(server_port);
+    // Find server by port
+    const std::vector<ServerConfig>& servers = _config.getServers();
+    const ServerConfig* server = NULL;
+    
+    for (size_t i = 0; i < servers.size(); i++) {
+        if (servers[i].port == server_port) {
+            server = &servers[i];
+            break;
+        }
+    }
+    
     if (!server) {
         result.error_code = 500;
         return result;
     }
     
     // Find location
-    const Location* location = _findLocation(*server, request_path);
+    const LocationConfig* location = _findLocation(*server, request_path);
     if (!location) {
         result.error_code = 404;
         return result;

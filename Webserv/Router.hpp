@@ -2,7 +2,7 @@
 #define ROUTER_HPP
 
 #include "HttpRequest.hpp"
-#include "../../Zep/includes/Config.hpp"
+#include "Config.hpp"
 
 enum RouteType {
     ROUTE_STATIC_FILE,
@@ -26,8 +26,8 @@ class Router {
 private:
     const Config& _config;
     
-    const Location* _findLocation(const ServerConfig& server, const std::string& path) const;
-    bool _isMethodAllowed(const Location& loc, const std::string& method) const;
+    const LocationConfig* _findLocation(const ServerConfig& server, const std::string& path) const;
+    bool _isMethodAllowed(const LocationConfig& loc, const std::string& method) const;
     bool _isCgiScript(const std::string& path) const;
     
 public:

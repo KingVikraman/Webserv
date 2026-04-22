@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../../Raja/includes/FileHandler.hpp"
+#include "FileHandler.hpp"
 #include "HttpRequest.hpp"
-#include "../../Raja/includes/HttpResponse.hpp"
+#include "HttpResponse.hpp"
 #include "Router.hpp"
-#include "../../Zep/includes/Config.hpp"
-#include "../../Raja/includes/UploadHandler.hpp"
-#include "../../Raja/includes/CgiHandler.hpp"
+#include "Config.hpp"
+#include "UploadHandler.hpp"
+#include "CgiHandler.hpp"
 
 class RequestHandler
 {

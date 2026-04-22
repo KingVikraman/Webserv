@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 #include <poll.h>
-#include "../../Zep/includes/Config.hpp"
+#include "Config.hpp"
 #include "RequestHandler.hpp"
 
 class Server {
