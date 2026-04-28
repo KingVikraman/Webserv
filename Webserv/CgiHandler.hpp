@@ -2,7 +2,7 @@
 #define CGIHANDLER_HPP
 
 
-#include "../../Brian/includes/HttpRequest.hpp"
+#include "HttpRequest.hpp"
 #include <sys/wait.h>
 #include <iostream>
 #include <unistd.h>

@@ -49,9 +49,9 @@ document.getElementById('getBtn').addEventListener('click',async function(){
 });
 
 document.getElementById('postBtn').addEventListener('click',async function(){
-  var path=document.getElementById('postPath').value||'/uploads/';
-  try{var r=await fetch(path,{method:'POST',headers:{'Content-Type':'text/plain'},body:'demo payload'});document.getElementById('postResp').textContent='HTTP '+r.status;toast('POST '+path+' -> '+r.status,r.ok?'var(--ok)':'var(--err)');}
-  catch(e){toast('POST failed','var(--err)');}
+  var text=document.getElementById('postPath').value;
+  try{var r=await fetch("/uploads/",{method:'POST',headers:{'Content-Type':'text/plain'},body:text});document.getElementById('postResp').textContent='HTTP '+r.status;toast('POST '+"/uploads/"+' -> '+r.status,r.ok?'var(--ok)':'var(--err)');}
+  catch(e){toast(e,'var(--err)');}
 });
 
 document.getElementById('delBtn').addEventListener('click',async function(){

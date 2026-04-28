@@ -2,7 +2,7 @@
 #define UPLOADHANDLER_HPP
 
 #include <string>
-#include "../../Brian/includes/HttpRequest.hpp"
+#include "HttpRequest.hpp"
 
 class UploadHandler {
 private:

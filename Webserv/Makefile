@@ -5,21 +5,17 @@ CXX = c++
 CXXFLAGS = -Wall -Werror -Wextra -std=c++98
 # -g -O0 -fsanitize=address
 
-INC_DIR_BRIAN = Brian/includes
-INC_DIR_RAJA = Raja/includes
-INC_DIR_ZEP = Zep/includes
-INC = -I$(INC_DIR_BRIAN) -I$(INC_DIR_RAJA) -I$(INC_DIR_ZEP)
-
 SRC =main.cpp \
-Brian/src/Server.cpp \
-Brian/src/RequestHandler.cpp \
-Brian/src/Router.cpp \
-Brian/src/HttpRequest.cpp \
-Raja/src/CgiHandler.cpp \
-Raja/src/HttpResponse.cpp \
-Raja/src/UploadHandler.cpp \
-Raja/src/FileHandler.cpp \
-Zep/src/Config.cpp
+	Server.cpp \
+	RequestHandler.cpp \
+	Router.cpp \
+	HttpRequest.cpp \
+	CgiHandler.cpp \
+	HttpResponse.cpp \
+	UploadHandler.cpp \
+	FileHandler.cpp \
+	Config.cpp \
+	ConfigParse.cpp
 
 OBJ_FOLDER = obj_files
 
