@@ -167,9 +167,6 @@ std::string CgiHandler:: execute(const std::string& script_path, HttpRequest & r
 		char* args_usr[] = {(char*)"/usr/bin/php-cgi", (char*)"-f", (char*)exec_script_path.c_str(), NULL};
 		execve(args_usr[0], args_usr, env_vars);
 
-		char* args_brew[] = {(char*)"/opt/homebrew/bin/php-cgi", (char*)"-f", (char*)exec_script_path.c_str(), NULL};
-		execve(args_brew[0], args_brew, env_vars);
-
 		_freeCharArray(env_vars);
 		std::cerr << "Execve Failed" << std::endl;
 		exit(1);
