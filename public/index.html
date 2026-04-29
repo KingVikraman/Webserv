@@ -38,7 +38,7 @@ body{font-family:"Rajdhani",sans-serif;background-color:var(--carbon);background
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.6rem;">
         <div style="border-radius:0.75rem;padding:0.85rem 1.1rem;border:1px solid var(--border);background:rgba(201,168,76,0.04);text-align:right;">
           <p class="label-xs">Target Server</p>
-          <p class="display" style="font-size:1rem;color:var(--gold);margin-top:3px;">localhost:8080</p>
+          <p id="target-server" class="display" style="font-size:1rem;color:var(--gold);margin-top:3px;">localhost:8080</p>
         </div>
         <div style="display:flex;align-items:center;gap:7px;"><div class="dot"></div><span style="font-size:0.82rem;color:var(--ok);font-weight:600;letter-spacing:0.05em;">ONLINE</span></div>
       </div>
@@ -52,5 +52,12 @@ body{font-family:"Rajdhani",sans-serif;background-color:var(--carbon);background
     </div>
   </header>
 </div>
+<script>
+  (function () {
+    var targetServer = document.getElementById("target-server");
+    if (!targetServer) return;
+    targetServer.textContent = window.location.host || window.location.hostname;
+  })();
+</script>
 </body>
 </html>
