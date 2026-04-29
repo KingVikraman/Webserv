@@ -1,5 +1,6 @@
 #include "Router.hpp"
 #include <algorithm>
+#include <unistd.h>
 
 Router::Router(const Config& config) : _config(config) {}
 Router::~Router() {}
@@ -111,15 +112,26 @@ Route Router::route(HttpRequest& request, int server_port) const {
         }
 
         if (_isCgiScript(full_path)) {
-            result.type = ROUTE_CGI;
-            result.cgi_path = full_path;
+            if (access(full_path.c_str(), F_OK) != 0) {
+                result.error_code = 404;
+            } else {
+                result.type = ROUTE_CGI;
+                result.cgi_path = full_path;
+            }
         } else {
             result.type = ROUTE_STATIC_FILE;
             result.file_path = full_path;
         }
     }
     else if (request.getMethodStr() == "POST") {
-        if (!location->upload_store.empty()) {
+        if (_isCgiScript(full_path)) {
+            if (access(full_path.c_str(), F_OK) != 0) {
+                result.error_code = 404;
+            } else {
+                result.type = ROUTE_CGI;
+                result.cgi_path = full_path;
+            }
+        } else if (!location->upload_store.empty()) {
             result.type = ROUTE_UPLOAD;
             result.upload_dir = location->upload_store;
         } else {
