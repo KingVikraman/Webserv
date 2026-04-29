@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CGI Test Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--gold:#C9A84C;--gold-bright:#F2D48B;--carbon:#080B0F;--panel:rgba(14,18,24,0.90);--panel2:rgba(20,25,32,0.95);--border:rgba(201,168,76,0.28);--border-hot:rgba(201,168,76,0.75);--text:rgba(230,235,242,0.92);--muted:rgba(180,188,200,0.55);--ok:#3DDB87;--err:#FF5470;}
+*{box-sizing:border-box;}body{margin:0;font-family:"Rajdhani",sans-serif;background:#080B0F;color:var(--text);min-height:100vh;background-image:repeating-linear-gradient(45deg,#080B0F 0px,#080B0F 10px,#0B0E14 10px,#0B0E14 20px);} 
+.wrap{max-width:980px;margin:0 auto;padding:2rem 1rem;} 
+.panel{background:linear-gradient(145deg,var(--panel),var(--panel2));border:1px solid var(--border);border-radius:1rem;padding:1.3rem;box-shadow:0 16px 45px rgba(0,0,0,.55);} 
+.display{font-family:"Orbitron",sans-serif;color:var(--gold-bright);} 
+.small{color:var(--muted);} 
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:.65rem 1.2rem;border-radius:.6rem;border:1px solid var(--border);background:linear-gradient(140deg,rgba(201,168,76,.15),rgba(201,168,76,.04));color:var(--gold-bright);font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:.2s;}
+.field,.area{width:100%;padding:.7rem .9rem;border-radius:.55rem;border:1px solid rgba(201,168,76,.3);background:rgba(5,8,13,.7);color:var(--text);} 
+.area{min-height:100px;resize:vertical;}
+.result{white-space:pre-wrap;font-family:monospace;background:rgba(5,8,13,.7);border:1px solid rgba(201,168,76,.25);border-radius:.55rem;padding:.8rem;min-height:120px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel" style="margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;">
+    <div><h1 class="display" style="font-size:1.3rem;">CGI TEST CONSOLE</h1><p class="small">Check existing and missing CGI behavior fast.</p></div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;"><a class="btn" href="/">Hero</a><a class="btn" href="/methods.html">Methods</a></div>
+  </div>
+
+  <div class="panel">
+    <p class="small" style="margin-bottom:.4rem;">Preset test case</p>
+    <select id="preset" class="field" style="margin-bottom:.8rem;">
+      <option value="ok_get">Existing CGI (GET)</option>
+      <option value="ok_get_query">Existing CGI with query (GET)</option>
+      <option value="ok_post">Existing CGI (POST with body)</option>
+      <option value="echo_query">Echo Query (GET)</option>
+      <option value="echo_body">Echo Body (POST)</option>
+      <option value="missing_get">Missing CGI (GET)</option>
+    </select>
+
+    <p class="small" style="margin-bottom:.4rem;">Existing CGI path</p>
+    <input id="okPath" class="field" value="/cgi-test.php"/>
+    <p class="small" style="margin:.7rem 0 .4rem;">POST body (optional)</p>
+    <textarea id="okBody" class="area" placeholder="hello from browser"></textarea>
+    <div style="display:flex;gap:.5rem;margin-top:.7rem;flex-wrap:wrap;">
+      <button id="okGet" class="btn">GET CGI</button>
+      <button id="okPost" class="btn">POST CGI</button>
+      <button id="missingGet" class="btn">GET Missing CGI</button>
+      <button id="runPreset" class="btn">Run Preset</button>
+    </div>
+    <p class="small" style="margin-top:.8rem;">Missing CGI expected: HTTP 404 (not 500)</p>
+  </div>
+
+  <div class="panel" style="margin-top:1rem;">
+    <p class="small" style="margin-bottom:.4rem;">Result</p>
+    <div id="result" class="result">Run a test to view status and response body.</div>
+  </div>
+</div>
+
+<script>
+async function runRequest(path, method, body){
+  var result = document.getElementById('result');
+  try{
+    var opts = { method: method };
+    if(method === 'POST'){
+      opts.headers = {'Content-Type':'text/plain'};
+      opts.body = body || '';
+    }
+    var res = await fetch(path, opts);
+    var text = await res.text();
+    result.textContent = 'HTTP ' + res.status + '\n\n' + text;
+  }catch(err){
+    result.textContent = 'Request failed: ' + err;
+  }
+}
+
+document.getElementById('okGet').addEventListener('click', function(){ runRequest(document.getElementById('okPath').value || '/cgi-test.php', 'GET'); });
+document.getElementById('okPost').addEventListener('click', function(){ runRequest(document.getElementById('okPath').value || '/cgi-test.php', 'POST', document.getElementById('okBody').value); });
+document.getElementById('missingGet').addEventListener('click', function(){ runRequest('/missing-cgi.php', 'GET'); });
+document.getElementById('runPreset').addEventListener('click', function(){
+  var preset = document.getElementById('preset').value;
+  if (preset === 'ok_get') {
+    runRequest('/cgi-test.php', 'GET');
+  } else if (preset === 'ok_get_query') {
+    runRequest('/cgi-test.php?name=demo', 'GET');
+  } else if (preset === 'ok_post') {
+    runRequest('/cgi-test.php', 'POST', 'hello from preset');
+  } else if (preset === 'echo_query') {
+    runRequest('/cgi-test.php?echo=hello-world', 'GET');
+  } else if (preset === 'echo_body') {
+    runRequest('/cgi-test.php', 'POST', 'echo-check-body');
+  } else if (preset === 'missing_get') {
+    runRequest('/missing-cgi.php', 'GET');
+  }
+});
+</script>
+</body>
+</html>
