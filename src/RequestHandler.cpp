@@ -16,12 +16,57 @@ void RequestHandler::setConfig(const Config* config, int port) {
 // ─── Error helper ────────────────────────────────────────────────────────────
 
 HttpResponse RequestHandler::_buildErrorResponse(int status_code) const {
+    if (_config) {
+        const std::vector<ServerConfig>& servers = _config->getServers();
+        const ServerConfig* server = NULL;
+
+        for (size_t i = 0; i < servers.size(); ++i) {
+            if (servers[i].port == _port) {
+                server = &servers[i];
+                break;
+            }
+        }
+
+        if (server) {
+            std::map<int, std::string>::const_iterator it = server->error_pages.find(status_code);
+            if (it != server->error_pages.end()) {
+                std::string target = it->second;
+                std::string full_path = target;
+
+                if (!target.empty() && target[0] == '/')
+                    full_path = server->root + target;
+
+                if (_file_handler.fileExists(full_path)) {
+                    HttpResponse resp;
+                    resp.setStatus(status_code);
+                    resp.setHeader("Content-Type", _file_handler.getMimeType(full_path));
+                    resp.setBody(_file_handler.getFileContents(full_path));
+                    return resp;
+                }
+            }
+        }
+    }
+
     if (status_code == 404)
         return HttpResponse::notFound();
     if (status_code == 405)
         return HttpResponse::methodNotAllowed();
     if (status_code == 500)
         return HttpResponse::internalError();
+    if (status_code == 403) {
+        HttpResponse resp;
+        resp.setStatus(403);
+        resp.setHeader("Content-Type", "text/html");
+        resp.setBody("<html><body><h1>403 Forbidden</h1></body></html>");
+        return resp;
+    }
+    if (status_code == 501) {
+        HttpResponse resp;
+        resp.setStatus(501);
+        resp.setHeader("Content-Type", "text/html");
+        resp.setBody("<html><body><h1>501 Not Implemented</h1></body></html>");
+        return resp;
+    }
     return HttpResponse::badRequest();
 }
 
@@ -86,11 +131,11 @@ HttpResponse RequestHandler::_handleGet(HttpRequest& request,
         if (!listing.empty())
             return HttpResponse::ok(listing, "text/html");
 
-        return HttpResponse::notFound();
+        return _buildErrorResponse(404);
     }
 
     if (!_file_handler.fileExists(path))
-        return HttpResponse::notFound();
+        return _buildErrorResponse(404);
 
     std::string body = _file_handler.getFileContents(path);
     std::string mime = _file_handler.getMimeType(path);
@@ -103,11 +148,11 @@ HttpResponse RequestHandler::_handleCgi(HttpRequest& request,
                                           const Route& route) const
 {
     if (!_file_handler.fileExists(route.cgi_path))
-        return HttpResponse::notFound();
+        return _buildErrorResponse(404);
 
     std::string cgi_output = _cgi_handler.execute(route.cgi_path, request);
     if (cgi_output.empty())
-        return HttpResponse::internalError();
+        return _buildErrorResponse(500);
 
     // CGI output starts with its own headers — find the blank line separator
     size_t header_end = cgi_output.find("\r\n\r\n");
@@ -163,12 +208,12 @@ HttpResponse RequestHandler::_handlePost(HttpRequest& request,
 
 HttpResponse RequestHandler::_handleDelete(const Route& route) const {
     if (!_file_handler.fileExists(route.file_path))
-        return HttpResponse::notFound();
+        return _buildErrorResponse(404);
 
     if (_upload_handler.deleteFile(route.file_path))
         return HttpResponse::noContent();
 
-    return HttpResponse::internalError();
+    return _buildErrorResponse(500);
 }
 
 // ─── Main entry point ────────────────────────────────────────────────────────
