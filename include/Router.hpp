@@ -9,6 +9,7 @@ enum RouteType {
     ROUTE_CGI,
     ROUTE_UPLOAD,
     ROUTE_DELETE,
+    ROUTE_REDIRECT,
     ROUTE_ERROR
 };
 
@@ -17,9 +18,11 @@ struct Route {
     std::string file_path;
     std::string cgi_path;
     std::string upload_dir;
+    int redirect_code;
+    std::string redirect_url;
     int error_code;
     
-    Route() : type(ROUTE_ERROR), error_code(404) {}
+    Route() : type(ROUTE_ERROR), redirect_code(302), error_code(404) {}
 };
 
 class Router {

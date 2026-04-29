@@ -88,6 +88,13 @@ Route Router::route(HttpRequest& request, int server_port) const {
         result.error_code = 405;
         return result;
     }
+
+    if (location->has_return) {
+        result.type = ROUTE_REDIRECT;
+        result.redirect_code = location->return_code;
+        result.redirect_url = location->return_url;
+        return result;
+    }
     
     // Build full file path
     std::string full_path = location->root + request_path;

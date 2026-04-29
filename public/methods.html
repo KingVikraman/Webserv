@@ -27,8 +27,8 @@
       <p id="getResp" class="small" style="margin-top:.5rem;"></p>
     </div>
     <div>
-      <p class="small" style="margin-bottom:.4rem;">POST text</p>
-      <div class="row"><input id="postPath" class="field" value="/uploads/"/><button id="postBtn" class="btn">POST</button></div>
+      <p class="small" style="margin-bottom:.4rem;">POST content (saves to /uploads/)</p>
+      <div class="row"><input id="postText" class="field" value="hi" placeholder="Type file content, e.g. hi"/><button id="postBtn" class="btn">POST</button></div>
       <p id="postResp" class="small" style="margin-top:.5rem;"></p>
     </div>
     <div>
@@ -49,8 +49,8 @@ document.getElementById('getBtn').addEventListener('click',async function(){
 });
 
 document.getElementById('postBtn').addEventListener('click',async function(){
-  var text=document.getElementById('postPath').value;
-  try{var r=await fetch("/uploads/",{method:'POST',headers:{'Content-Type':'text/plain'},body:text});document.getElementById('postResp').textContent='HTTP '+r.status;toast('POST '+"/uploads/"+' -> '+r.status,r.ok?'var(--ok)':'var(--err)');}
+  var text=document.getElementById('postText').value;
+  try{var r=await fetch('/uploads/',{method:'POST',headers:{'Content-Type':'text/plain'},body:text});document.getElementById('postResp').textContent='HTTP '+r.status+' (saved to /uploads/)';toast('POST /uploads/ -> '+r.status,r.ok?'var(--ok)':'var(--err)');}
   catch(e){toast(e,'var(--err)');}
 });
 
