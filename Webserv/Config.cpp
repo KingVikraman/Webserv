@@ -3,7 +3,7 @@
 
 LocationConfig::LocationConfig() : autoindex(false), has_return(false), return_code(302) {}
 
-ServerConfig::ServerConfig() : port(-1), client_max_body_size(0) {}
+ServerConfig::ServerConfig() : host("0.0.0.0"), port(-1), client_max_body_size(0) {}
 
 std::string readFile(const std::string& filename)
 {
@@ -56,6 +56,7 @@ void printConfig(const std::vector<ServerConfig> &servers)
 	for (size_t i = 0; i < servers.size(); i++)
 	{
 		std::cout << "Server " << i << ":\n";
+		std::cout << "  Host: " << servers[i].host << "\n";
 		std::cout << "  Port: " << servers[i].port << "\n";
 		std::cout << "  Root: " << servers[i].root << "\n";
 		std::cout << "  Client Max Body Size: " << servers[i].client_max_body_size << "\n";

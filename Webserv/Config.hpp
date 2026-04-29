@@ -27,6 +27,7 @@ class ServerConfig
 {
 public:
 	ServerConfig();
+	std::string host;
 	int port;
 	std::vector<std::string> server_names;
 	std::vector<std::string> index;
