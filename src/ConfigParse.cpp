@@ -174,13 +174,31 @@ void configParse::parseServer()
 			
 			if (peek() == ";")
 				throw std::runtime_error("missing value for listen");
-			std::string portStr = next();
-			for (size_t i = 0; i < portStr.size(); ++i)
-			{
-				if (portStr[i] < '0' || portStr[i] > '9')
-					throw std::runtime_error("invalid listen port: " + portStr);
+			std::string listenStr = next();
+			size_t colon_pos = listenStr.find(':');
+			if (colon_pos != std::string::npos) {
+				server.host = listenStr.substr(0, colon_pos);
+				std::string portStr = listenStr.substr(colon_pos + 1);
+				for (size_t i = 0; i < portStr.size(); ++i)
+					if (portStr[i] < '0' || portStr[i] > '9')
+						throw std::runtime_error("invalid listen port: " + portStr);
+				server.port = std::atoi(portStr.c_str());
+			} else {
+				bool is_port = true;
+				for (size_t i = 0; i < listenStr.size(); ++i) {
+					if (listenStr[i] < '0' || listenStr[i] > '9') {
+						is_port = false;
+						break;
+					}
+				}
+				if (is_port) {
+					server.host = "0.0.0.0";
+					server.port = std::atoi(listenStr.c_str());
+				} else {
+					server.host = listenStr;
+					server.port = 80;
+				}
 			}
-			server.port = std::atoi(portStr.c_str());
 			expect(";");
 		}
 		else if (peek() == "server_name")
