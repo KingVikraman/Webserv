@@ -1,16 +1,11 @@
 #pragma once
 
 #include <map>
-#include <set>
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <vector>
-#include <algorithm>
-#include <iterator>
-#include <list>
 #include <sys/types.h>
-#include <cstring>
 
 
 #define MAX_URI_LENGTH 4096
@@ -72,28 +67,17 @@ class HttpRequest
 
         HttpMethod                                  &getMethod();
         std::string                                 &getPath();
-        std::string                                 &getQuery();
-        std::string                                 &getFragment();
         std::string                                 getHeader(std::string const &);
-		const std::map<std::string, std::string>    &getHeaders() const;
-		std::string                                 getMethodStr();
+        std::string                                 getMethodStr();
         std::string                                 &getBody();
-        std::string                                 getServerName();
         std::string                                 &getBoundary();
         bool                                        getMultiformFlag();
 
-        void        setMethod(HttpMethod &);
         void        setHeader(std::string &, std::string &);
-        void        setMaxBodySize(size_t);
-        void        setBody(std::string name);
 
         void        feed(const char *data, size_t size);
         bool        parsingCompleted();
-        void        printMessage();
-        void        clear();
         int         errorCode();
-        bool        keepAlive();
-        void        cutReqBody(int bytes);
     
     private:
         std::string                         _path;
@@ -105,22 +89,18 @@ class HttpRequest
         HttpMethod                          _method;
         std::map<int, std::string>          _method_str;
         ParsingState                        _state;
-        size_t                              _max_body_size;
         size_t                              _body_length;
         int                                 _error_code;
         size_t                              _chunk_length;
         std::string                         _storage;
         std::string                         _key_storage;
         int                                 _method_index;
-        u_int8_t                            _ver_major;
-        u_int8_t                            _ver_minor;
         std::string                         _server_name;
         std::string                         _body_str;
 
         bool                                _fields_done_flag;
         bool                                _body_flag;
         bool                                _body_done_flag;
-        bool                                _complete_flag;
         bool                                _chunked_flag;
         bool                                _multiform_flag;
 

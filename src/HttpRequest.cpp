@@ -91,24 +91,9 @@ std::string &HttpRequest::getPath()
     return (_path);
 }
 
-std::string &HttpRequest::getQuery()
-{
-    return (_query);
-}
-
-std::string &HttpRequest::getFragment()
-{
-    return (_fragment);
-}
-
 std::string HttpRequest::getHeader(std::string const &name)
 {
     return (_request_headers[name]);
-}
-
-const std::map<std::string, std::string> &HttpRequest::getHeaders() const // dictionary
-{
-    return (this->_request_headers);
 }
 
 std::string HttpRequest::getMethodStr()
@@ -119,11 +104,6 @@ std::string HttpRequest::getMethodStr()
 std::string &HttpRequest::getBody()
 {
     return (_body_str);
-}
-
-std::string HttpRequest::getServerName()
-{
-    return (this->_server_name);
 }
 
 bool HttpRequest::getMultiformFlag()
@@ -137,28 +117,11 @@ std::string &HttpRequest::getBoundary()
 }
 
 // Setters
-void HttpRequest::setBody(std::string body)
-{
-    _body.clear();
-    _body.insert(_body.begin(), body.begin(), body.end());
-    _body_str = body;
-}
-
-void HttpRequest::setMethod(HttpMethod &method)
-{
-    _method = method;
-}
-
 void HttpRequest::setHeader(std::string &name, std::string &value)
 {
     trimStr(value);
     toLower(name);
     _request_headers[name] = value;
-}
-
-void HttpRequest::setMaxBodySize(size_t size)
-{
-    _max_body_size = size;
 }
 
 void HttpRequest::_handle_headers()
@@ -442,8 +405,6 @@ void HttpRequest::feed(const char *data, size_t size)
                     std::cout << "Bad Character (Request_Line_Major)" << std::endl;
                     return;
                 }
-                _ver_major = character;
-
                 _state = Request_Line_Dot;
                 break;
             }
@@ -466,7 +427,6 @@ void HttpRequest::feed(const char *data, size_t size)
                     std::cout << "Bad Character (Request_Line_Minor)" << std::endl;
                     return;
                 }
-                _ver_minor = character;
                 _state = Request_Line_CR;
                 break;
             }
@@ -742,30 +702,4 @@ bool    HttpRequest::parsingCompleted()
 int     HttpRequest::errorCode()
 {
     return (this->_error_code);
-}
-
-void    HttpRequest::clear()
-{
-    _path.clear();
-    _error_code = 0;
-    _query.clear();
-    _fragment.clear();
-    _method = NONE;
-    _method_index = 1;
-    _state = Request_Line;
-    _body_length = 0;
-    _chunk_length = 0x0;
-    _storage.clear();
-    _body_str = "";
-    _key_storage.clear();
-    _request_headers.clear();
-    _server_name.clear();
-    _body.clear();
-    _boundary.clear();
-    _fields_done_flag = false;
-    _body_flag = false;
-    _body_done_flag = false;
-    _complete_flag = false;
-    _chunked_flag = false;
-    _multiform_flag = false;
 }
