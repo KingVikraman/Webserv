@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 
 Server::Server(const Config& config) : _config(config) {}
 
@@ -14,7 +15,7 @@ Server::~Server() {
 		close(_fds[i].fd);
 }
 
-int Server::_createListenSocket(int port) {
+int Server::_createListenSocket(const std::string& host, int port) {
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd < 0) { std::cerr << "socket() failed\n"; return -1; }
 	int opt = 1;
@@ -23,7 +24,11 @@ int Server::_createListenSocket(int port) {
 	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	addr.sin_addr.s_addr = INADDR_ANY;
+	
+	std::string resolved_host = host;
+	if (resolved_host == "localhost") resolved_host = "127.0.0.1";
+	addr.sin_addr.s_addr = inet_addr(resolved_host.c_str());
+	
 	addr.sin_port = htons(port);
 	if (bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
 		std::cerr << "bind() failed on port " << port << "\n";
@@ -37,7 +42,7 @@ int Server::_createListenSocket(int port) {
 bool Server::start() {
 	const std::vector<ServerConfig>& servers = _config.getServers();
 	for (size_t i = 0; i < servers.size(); i++) {
-		int fd = _createListenSocket(servers[i].port);
+		int fd = _createListenSocket(servers[i].host, servers[i].port);
 		if (fd < 0) return false;
 		_server_fds.push_back(fd);
 		pollfd pfd; pfd.fd = fd; pfd.events = POLLIN; pfd.revents = 0;
@@ -120,7 +125,7 @@ bool Server::_isServerFd(int fd) const {
 }
 
 void Server::run() {
-	std::cout << "Server running. Open http://localhost:"
+	std::cout << "Server running. Open http://" << _config.getServers()[0].host << ":"
 			  << _config.getServers()[0].port << " in your browser.\n";
 	while (true) {
 		int ready = poll(&_fds[0], _fds.size(), -1);

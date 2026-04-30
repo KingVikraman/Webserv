@@ -24,7 +24,7 @@ private:
     std::map<int, std::string>  _client_buffers;   // incoming data per fd
     std::map<int, std::string>  _client_responses; // outgoing data per fd
 
-    int  _createListenSocket(int port);
+    int  _createListenSocket(const std::string& host, int port);
     void _acceptConnection(int server_fd);
     void _readFromClient(size_t index);
     void _writeToClient(size_t index);
