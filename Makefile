@@ -45,7 +45,7 @@ $(NAME): $(OBJ_SRC)
 	@echo "${GREEN}--------- WEBSERVER COMPILED SUCCESSFULLY ---------${RESET}"
 	@echo
 	@echo "          \033[5;1;33m==============================\033[0m"
-	@echo "              RUNNING ・ 2026 ・ BY R/B/Z"
+	@echo "            RUNNING ・ 2026 ・ BY R/B/Z"
 	@echo "          \033[5;1;33m==============================\033[0m"
 	@echo
 
@@ -66,7 +66,7 @@ fclean: clean
 	@echo "\033[5;1;31m           WARNING!!   \033[0m"
 	@echo
 	@echo "\033[3;31m    THIS ACTION IS IRREVERSABLE... \033[0m"
-	@sleep 4.0
+	@sleep 2.5
 	@echo "\033[1;36m╔════════════════════════════════════════════╗\033[0m"
 	@echo "\033[1;36m║          CLEANUP SEQUENCE COMPLETE         ║\033[0m"
 	@echo "\033[1;36m╚════════════════════════════════════════════╝\033[0m"
