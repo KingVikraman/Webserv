@@ -1,4 +1,6 @@
 #include "HttpRequest.hpp"
+#include <iostream>
+#include <sstream>
 
 // Helper func
 
@@ -59,17 +61,13 @@ HttpRequest::HttpRequest()
     _method_str[::PUT] = "PUT";
     _method_str[::HEAD] = "HEAD";
     _path = "";
-    _query = "";
-    _fragment = "";
     _body_str = "";
     _error_code = 0;
     _chunk_length = 0;
     _method = NONE;
     _method_index = 1;
     _state = Request_Line;
-    _fields_done_flag = false;
     _body_flag = false;
-    _body_done_flag = false;
     _chunked_flag = false;
     _body_length = 0;
     _storage = "";
@@ -139,11 +137,6 @@ void HttpRequest::_handle_headers()
         if (_request_headers["transfer-encoding"].find("chunked") != std::string::npos)
             _chunked_flag = true;
         _body_flag = true;
-    }
-    if (_request_headers.count("host"))
-    {
-        size_t pos = _request_headers["host"].find_first_of(':');
-        _server_name = _request_headers["host"].substr(0, pos); // serevr name
     }
     if (_request_headers.count("content-type") && _request_headers["content-type"].find("multipart/form-data") != std::string::npos)
     {
@@ -288,14 +281,12 @@ void HttpRequest::feed(const char *data, size_t size)
                 if (character == ' ') // url eneded, now expect HTTP version
                 {
                     _state = Request_Line_Ver;
-                    _query.append(_storage);
                     _storage.clear();
                     continue;
                 }
                 else if (character == '#')
                 {
                     _state = Request_Line_URI_Fragment;
-                    _query.append(_storage);
                     _storage.clear();
                     continue;
                 }
@@ -318,7 +309,6 @@ void HttpRequest::feed(const char *data, size_t size)
                 if (character == ' ')
                 {
                     _state = Request_Line_Ver;
-                    _fragment.append(_storage);
                     _storage.clear();
                     continue;
                 }
@@ -472,7 +462,6 @@ void HttpRequest::feed(const char *data, size_t size)
                 if (character == '\n')
                 {
                     _storage.clear();
-                    _fields_done_flag = true;
                     _handle_headers();
                     // if no body then parsing is completed.
                     if (_body_flag == 1) // if body is expected, move to body parsing state
@@ -666,7 +655,6 @@ void HttpRequest::feed(const char *data, size_t size)
                     std::cout << "Bad Character (Chunked_End_LF)" << std::endl;
                     return;
                 }
-                _body_done_flag = true;
                 _state = Parsing_Done;
                 continue;
             }
@@ -676,7 +664,6 @@ void HttpRequest::feed(const char *data, size_t size)
                     _body.push_back(character); // as long as body is not fully read, keep adding characters to body vector
                 if (_body.size() == _body_length)
                 {
-                    _body_done_flag = true;
                     _state = Parsing_Done;
                 }
                 break;

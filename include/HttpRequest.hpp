@@ -2,8 +2,6 @@
 
 #include <map>
 #include <string>
-#include <sstream>
-#include <iostream>
 #include <vector>
 #include <sys/types.h>
 
@@ -81,8 +79,6 @@ class HttpRequest
     
     private:
         std::string                         _path;
-        std::string                         _query;
-        std::string                         _fragment;
         std::map<std::string, std::string>  _request_headers;
         std::vector<u_int8_t>               _body;
         std::string                         _boundary;
@@ -95,12 +91,9 @@ class HttpRequest
         std::string                         _storage;
         std::string                         _key_storage;
         int                                 _method_index;
-        std::string                         _server_name;
         std::string                         _body_str;
 
-        bool                                _fields_done_flag;
         bool                                _body_flag;
-        bool                                _body_done_flag;
         bool                                _chunked_flag;
         bool                                _multiform_flag;
 
