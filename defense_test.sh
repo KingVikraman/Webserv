@@ -142,7 +142,7 @@ code="$(status_of DELETE "$BASE_URL/uploads/$uploaded_name")"
 check_one_of "DELETE uploaded file" "$code" "200,204"
 
 print_header "Body Size Limit (expect 413)"
-dd if=/dev/zero of="$LARGE_FILE" bs=1m count=11 >/dev/null 2>&1
+dd if=/dev/zero of="$LARGE_FILE" bs=1M count=11 >/dev/null 2>&1
 code="$(curl -sS -o /tmp/webserv_body.out -w "%{http_code}" -X POST "$BASE_URL/upload" -F "file=@$LARGE_FILE")"
 check_one_of "POST > client_max_body_size" "$code" "413"
 
