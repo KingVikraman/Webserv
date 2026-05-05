@@ -18,9 +18,16 @@ enum HttpMethod
     NONE
 };
 
+/*
+GET /images/logo.png?size=small#top HTTP/1.1
+Host: example.com
+User-Agent: curl/8.0
+Accept: 
+*/
+
 enum ParsingState
 {
-    Request_Line,                   // Detect first letter G P D H
+    Request_Line,                   // Detect first letter G P D H (Get, post, delete, head)
     Request_Line_Post_Put,          // Special handling for Post and Put
     Request_Line_Method,            // Detect the rest of the method
     Request_Line_First_Space,       // Detect the first space after the method
@@ -57,6 +64,21 @@ enum ParsingState
     Parsing_Done                    
 };
 
+/*
+Chunked 
+POST /upload HTTP/1.1
+Host: example.com
+Transfer-Encoding: chunked
+
+4
+Wiki
+5
+pedia
+0
+
+
+*/
+
 class HttpRequest
 {
     public:
@@ -78,24 +100,24 @@ class HttpRequest
         int         errorCode();
     
     private:
-        std::string                         _path;
-        std::map<std::string, std::string>  _request_headers;
-        std::vector<u_int8_t>               _body;
-        std::string                         _boundary;
-        HttpMethod                          _method;
-        std::map<int, std::string>          _method_str;
-        ParsingState                        _state;
-        size_t                              _body_length;
-        int                                 _error_code;
-        size_t                              _chunk_length;
-        std::string                         _storage;
-        std::string                         _key_storage;
-        int                                 _method_index;
-        std::string                         _body_str;
+        std::string                         _path;              // Parsed target path from request line (e.g. "/upload/file.txt").
+        std::map<std::string, std::string>  _request_headers;   // Header dictionary (keys normalized to lowercase).
+        std::vector<u_int8_t>               _body;              // Raw body bytes collected during parsing.
+        std::string                         _boundary;          // multipart/form-data boundary token when present.
+        HttpMethod                          _method;            // Parsed HTTP method.
+        std::map<int, std::string>          _method_str;        // Method lookup table used by request-line validation.
+        ParsingState                        _state;             // Current state position.
+        size_t                              _body_length;       // Expected body length when Content-Length is used.
+        int                                 _error_code;        // HTTP parse error code (0 means no error).
+        size_t                              _chunk_length;      // Remaining bytes for current chunk in chunked mode.
+        std::string                         _storage;           // Generic temporary token buffer used across states.
+        std::string                         _key_storage;       // Header key temporary storage while parsing "Key: Value".
+        int                                 _method_index;      // Current character index while validating method string. (GET, method index 0 is 'G', index 1 is 'E', index 2 is 'T')
+        std::string                         _body_str;          // Final body string exposed through getBody().
 
-        bool                                _body_flag;
-        bool                                _chunked_flag;
-        bool                                _multiform_flag;
+        bool                                _body_flag;         // True once parser decides a body is expected.
+        bool                                _chunked_flag;      // True when "Transfer-Encoding: chunked" is detected.
+        bool                                _multiform_flag;    // True when multipart/form-data content type is detected.
 
-        void        _handle_headers();
+        void        _handle_headers();                          // Post-header processing: derive body mode, sizes, boundary, flags.
 };

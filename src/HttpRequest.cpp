@@ -126,11 +126,11 @@ void HttpRequest::_handle_headers()
 {
     std::stringstream ss;
 
-    if (_request_headers.count("content-length"))
+    if (_request_headers.count("content-length")) // returns 1 if content-length header is presen
     {
         _body_flag = true;
         ss << _request_headers["content-length"]; // put sring value into stream
-        ss >> _body_length;                       // extract the number from the stream into body_length
+        ss >> _body_length;                       // extract the number from the stream into body_length convert into size_t
     }
     if (_request_headers.count("transfer-encoding"))
     {
@@ -150,7 +150,7 @@ void HttpRequest::_handle_headers()
 void HttpRequest::feed(const char *data, size_t size)
 {
     u_int8_t character;
-    std::stringstream s; // Do check on this
+    std::stringstream s;
 
     for (size_t i = 0; i < size; ++i)
     {
@@ -569,7 +569,7 @@ void HttpRequest::feed(const char *data, size_t size)
             }
             case Chunked_Ignore:
             {
-                // Ignore chunk extensions until end of line
+                // Ignore chunk extensions until end of line (4;foo=bar\r\n), ignore ";foo=bar" part and just move to next line to read chunk data
                 if (character == '\r')
                     _state = Chunked_Length_LF;
                 continue;

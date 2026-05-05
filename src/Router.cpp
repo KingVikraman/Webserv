@@ -26,7 +26,7 @@ const LocationConfig* Router::_findLocation(const ServerConfig& server, const st
                 is_boundary = true;
         }
 
-        if (is_prefix && is_boundary) {
+        if (is_prefix && is_boundary) {              // keeeping the longest matching prefix location
             if (loc_path.length() > best_length) {
                 best_match = &loc;
                 best_length = loc_path.length();
