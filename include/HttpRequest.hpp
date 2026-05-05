@@ -4,7 +4,9 @@
 #include <string>
 #include <vector>
 #include <sys/types.h>
-
+#include <iostream>
+#include <sstream>
+#include <cstring>
 
 #define MAX_URI_LENGTH 4096
 
